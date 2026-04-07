@@ -1,0 +1,7 @@
+faq/
+        ├── faq.interface.ts
+        ├── faq.model.ts
+        ├── faq.validation.ts
+        ├── faq.service.ts
+        ├── faq.controller.ts
+        └── faq.route.ts

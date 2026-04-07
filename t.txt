@@ -1,0 +1,324 @@
+## Client Questions (Pricing + Product + Order Rules)
+
+### 1) Glass Types & Base Pricing (Rate Card)
+- Glass types list কি ফিক্সড নাকি future এ নতুন glass type add হবে?
+- Admin কি glass type অনুযায়ী **base price** (per sqm) change করতে পারবে? 
+- Currency সবসময় GBP থাকবে তো?
+
+### 2) Artwork Fee & Minimum Charge
+- Artwork fee কি সব glass type এ লাগবে, নাকি শুধু Printed/কিছু নির্দিষ্ট glass এ?
+- Minimum charge কি আছে? 
+
+### 3) VAT / Tax Rules
+- VAT % সবসময় 20% থাকবে নাকি admin পরিবর্তন করতে পারবে?
+- Fitting/Addon cost এর উপর VAT apply হবে তো?
+- Price display VAT inclusive নাকি exclusive?
+
+### 4) Add-on Pricing (Socket / Large Cut / Fitting)
+- Socket cutout cost (£18): এটা কি **per socket**?
+- Socket type (square/circle/custom) অনুযায়ী price change হবে?
+- Socket size (width/height) কি pricing affect করবে?
+- Fitting cost (£300 + VAT): এটা কি
+  - optional নাকি mandatory?
+  - per order নাকি per panel?
+
+### 5) Shape Rules (Large Cut Count Mapping)
+- L_PANEL = কয়টা large cut?
+- PLUS_PANEL = কয়টা large cut? (client বলেছে 4—confirm)
+- T_PANEL = কয়টা large cut?
+- THREE_PANEL_T_LAYOUT = কয়টা large cut? (per panel নাকি total)
+- Shape অনুযায়ী socket placement limit/rules আছে কি?
+
+### 6) Size Constraints & Measurement Rules
+- Minimum width/height আছে?
+- Maximum width/height আছে?
+- Any max area limit (sqm)?
+- Inner corner radius সবসময় 10mm থাকবে?
+    - naki besi hobe ?
+    - naki combesi korte parbe ?
+    
+* * * * * * * * * * * * * * * * * * * *
+- Dimensions rounding rule আছে?      *
+  - mm round হবে?                     * 
+  - area sqm round up/down হবে?       *
+* * * * * * * * * * * * * * * * * * * *
+
+### 7) Product Structure (How to model products)
+- একেকটা glass type কি একেকটা product card হবে?
+- একই glass type এর একাধিক variation লাগবে?
+  - thickness (6mm/8mm/10mm)
+  - finish
+- Color options কি শুধু UI, নাকি কিছু color এর price extra?
+
+### 8) Order Flow & Status
+- Order status flow confirm:
+  - ORDER_PLACED → MEASUREMENT_SCHEDULED → GLASS_IN_PRODUCTION → INSTALLATION_PENDING → ORDER_COMPLETED
+- Cancel/Refund policy কী?
+- Payment flow কী?
+  - full upfront?
+  - deposit?
+  - after installation?
+- Admin কি manual price override করতে পারবে (special case)?
+
+---
+
+## Must Ask First (Top Priority)
+- Glass type base price admin change করতে পারবে কি?
+- Large cut count rule ঠিক কী? (shape wise mapping)
+- Socket pricing কি সব socket এ same?
+- Fitting pricing per order নাকি per panel?
+- VAT % configurable কি না?
+
+
+====================
+STATUS OF THE DAY
+Date: 18-3-2026
+Name: MD. Abdullah All Shamem
+Team Name: MERN Mavericks
+
+Project : Fedicycle Admin Dashboard
+
+I have complete update CMS feedback section UI under seller dashboard
+I have complete integrate feedback card and feedback list with API
+I have complete implement pagination dropdown and limit control in CMS module
+I have complete fix API call issues and optimize CMS data fetching
+I have complete integrate FAQ management with CMS API
+I have complete update CMS redux logic for better state handling
+I have complete improve dashboard CMS UI responsiveness and structure
+
+Project : Fedicycle Backend
+
+I have complete update FAQ module (controller, service, model)
+I have complete implement feedback module with full CRUD functionality
+I have complete create feedback API (controller, service, route, validation)
+I have complete implement pagination system and total count for feedback API
+I have complete create getAllFeedbacks and getHomeFeedbacks API
+I have complete implement featured status update API for feedback
+I have complete update product category route and related API improvements
+I have complete optimize backend response structure using sendResponse utility
+
+Github Admin Dashboard : https://github.com/Webgenius0/fedicycle_mern_dashboard
+Github Backend : https://github.com/Webgenius0/fedicycle_mern_express
+
+Branch: abdullah
+Progress: 82%
+============================
+
+Hello Adam,
+
+I hope you and your family are safe and sound!
+
+As per your order requirement and message request, I've completed the following tasks:
+
+Project : Fedicycle Admin Dashboard
+- I have complete update CMS feedback section UI under seller dashboard
+- I have complete integrate feedback card and feedback list with API
+- I have complete implement pagination dropdown and limit control in CMS module
+- I have complete fix API call issues and optimize CMS data fetching
+- I have complete integrate FAQ management with CMS API
+- I have complete update CMS redux logic for better state handling
+- I have complete improve dashboard CMS UI responsiveness and structure
+- 
+Project : Fedicycle Backend
+- I have complete update FAQ module (controller, service, model)
+- I have complete implement feedback module with full CRUD functionality
+- I have complete create feedback API (controller, service, route, validation)
+- I have complete implement pagination system and total count for feedback API
+- I have complete create getAllFeedbacks and getHomeFeedbacks API
+- I have complete implement featured status update API for feedback
+- I have complete update product category route and related API improvements
+- I have complete optimize backend response structure using sendResponse utility
+
+For your better understanding, I have created an explanatory video, which you can watch here : https://app.usebubbles.com/nKPrmgRB6AT6RowvQP8nkJ/recording-mar-18-2026
+
+Please have a look at the admin dashboard using the link below. 
+
+Credentials And Website Link : https://docs.google.com/document/d/1jpckT6KK1CYGuYKYbKfdkZGLcH8oe6nrFnLEixP8Ec8/edit?usp=sharing
+
+For some reason, If you have any questions, concerns or modifications please let me know. I'll be very happy to assist you.
+
+Looking forward to hearing from you.
+
+Best Regards.
+===================================
+STATUS OF THE DAY
+Date: 24-03-2026
+Name: MD. Abdullah All Shamem
+Team Name: MERN Mavericks
+
+Project: Fedicycle Backend
+
+- I have complete update create order flow with new product info and removed fittingCost field
+- I have complete update order interface and order validation structure
+- I have complete refactor product pricing and order stock deduction logic
+- I have complete remove productPrices as pricing now handled inside product items
+- I have complete refactor overall pricing structure and order calculation logic
+- I have complete update order validation schema with improved shape handling
+- I have complete update quantity system (per shape quantity support) and socket logic based on interface
+- I have complete sync interface, Zod validation, and Mongoose model for consistency
+- I have complete update order model and create reusable order pricing utility functions 
+Github Backend: https://github.com/Webgenius0/fedicycle_mern_express
+
+Branch: abdullah
+Progress: 88%
+
+===================================
+STATUS OF THE DAY
+Date: 28-03-2026
+Name: MD. Abdullah All Shamem
+Team Name: MERN Mavericks
+
+Project: Fedicycle Admin Dashboard (Frontend)
+- Completed product setup flow integration with backend APIs
+- Implemented single product delete functionality and API integration
+- Added product simple validation for better form handling
+- Created Vercel deployment configuration
+- Removed unnecessary components and cleaned up codebase
+- Completed all product routes (create, update, delete) with UI integration
+- Updated payload structure according to backend API
+Project: Fedicycle Backend
+- Fixed delete API issue and maintained reference count consistency
+- Implemented product data saving functionality
+- Handled image update/removal with auto decrement logic
+- Built profile module (create/update) with direct delete & upload system using Cloudinary
+- Updated CORS policy and configured Vercel settings
+- Implemented customer-specific order visibility system
+- Updated message schema with phone number support
+- Improved contact & policy message handling system
+
+GitHub Admin Dashboard:
+https://github.com/Webgenius0/fedicycle_mern_dashboard
+
+GitHub Backend:
+https://github.com/Webgenius0/fedicycle_mern_express
+
+Branch: abdullah
+Progress: 85%
+======================
+STATUS OF THE DAY
+Date: 29-03-2026
+Name: MD. Abdullah All Shamem
+Team Name: MERN Mavericks
+
+Project: Fedicycle Admin Dashboard (Frontend)
+
+- Created order details page
+- Implemented responsive order list
+- Added order status update functionality
+- Converted static order-under code to dynamic from API
+- Created order list table according to backend data
+- Improved order list UI/UX using skeleton
+- Created skeleton for better UI
+- Set product data for seeding
+
+Project: Fedicycle Backend
+
+- Updated and fixed image upload and Vercel deploy problem
+- Fixed delete API and maintained reference count
+
+GitHub Admin Dashboard:
+https://github.com/Webgenius0/fedicycle_mern_dashboard
+
+GitHub Backend:
+https://github.com/Webgenius0/fedicycle_mern_express
+
+Branch: abdullah
+Progress: 88%
+
+=================================
+
+STATUS OF THE DAY
+Date: 31-03-2026
+Name: MD. Abdullah All Shamem
+Team Name: MERN Mavericks
+
+Project: Fedicycle Admin Dashboard (Frontend)
+
+- Implemented admin order management dashboard with status tracking
+- Created detailed order view page with full order information
+- Improved order details UI and modal layout
+- Added shape visualization support in admin dashboard
+- Developed order cart list, order table, and order items card
+- Updated orders table with refetch button functionality
+- Enhanced order display system for better data representation
+
+
+Project: Fedicycle Backend
+
+- Implemented order creation service with pricing, area, and stock management logic
+- Added generate key functionality for order identity
+- Improved order validation for better handling of shape mismatch cases
+- Updated order status API and business logic
+- Refactored order interface and structure
+- Fixed password change validation logic according to auth system
+- Removed unnecessary comment system from order module
+
+GitHub Admin Dashboard:
+
+https://github.com/Webgenius0/fedicycle_mern_dashboard
+
+GitHub Backend:
+
+https://github.com/Webgenius0/fedicycle_mern_express
+
+Branch: abdullah
+Progress: 89%
+============================
+Hello Adam,
+
+I hope you and your family are safe and sound!
+
+As per your order requirement and message request, I've completed the following tasks:
+
+- I've completed dashboard overview
+- I've completed order managemenet page
+- I've completed order details page
+- I've completed product managemenet page
+- I've completed product details page
+- I've completed profile managemenet page
+- I've completed profile details page
+- I've completed customer managemenet page
+- I've completed customer details page
+- I've completed order managemenet page
+- I've completed order details page
+- I've completed CMS part for Web site managemenet
+
+For your better understanding, I have created an explanatory video, which you can watch here:
+https://app.usebubbles.com/mR96WYAyezNUzveKVfSCWh/recording-apr-02-2026
+
+Please have a look at the admin dashboard using the link below. 
+
+Admin Dashboard Link: https://fedicycle-admin-dashboard-client-si.vercel.app/
+
+For some reason, If you have any questions, concerns or modifications please let me know. I'll be very happy to assist you.
+
+Looking forward to hearing from you.
+
+Best Regards.
+
+===============================================================
+STATUS OF THE DAY
+Date: 05-04-2026
+Name: Md. Abdullah All Shamem
+Team Name: MERN Mavericks
+
+Project: Dashboard & Shopping Cart Enhancements
+
+- I have completed refactoring dashboard components for better layout and responsiveness
+- I have completed improving API error handling and token refresh logic
+- I have completed adding logout on unauthorized access and enhancing loading states
+- I have completed enhancing ShoppingCartPage and AddressForm with animations and better UI
+- I have completed implementing user management with fetchUser and clearUser features
+- I have completed fixing 401 error handling and improving order creation feedback
+- I have completed improving quantity update and error handling in shopping cart
+- I have completed syncing cart calculation with backend data
+- I have completed adjusting cart design for better fit and usability
+- I have completed fixing price subtotal display issues
+- I have completed improving Address page UI for better user experience
+- I have completed creating the Order page from scratch
+
+GitHub:
+https://github.com/Webgenius0/fedicycle_mern_dashboard
+
+Branch: abdullah
+Progress: 85%

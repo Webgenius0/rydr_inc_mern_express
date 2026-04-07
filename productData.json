@@ -1,0 +1,374 @@
+{
+  "success": true,
+  "message": "Products fetched successfully",
+  "data": [
+    {
+      "_id": "69c5f3d6fccbfe7671f0225d",
+      "name": "Toughened Clear Glass",
+      "slug": "toughened-clear-glass",
+      "title": "Toughened Clear Glass",
+      "glassType": "TOUGHENED_CLEAR",
+      "isAvailable": true,
+      "colorImageGroups": [
+        {
+          "colors": {
+            "key": "clear",
+            "label": "Clear",
+            "hexCode": "#ffffff"
+          },
+          "gallery": [
+            {
+              "url": "https://res.cloudinary.com/djrksfqkh/image/upload/v1774519982/fedicycle/products/product-8c8660b00af1fa9ec6cf90d178afbf20.jpg",
+              "alt": "img1"
+            },
+            {
+              "url": "https://res.cloudinary.com/djrksfqkh/image/upload/v1774519984/fedicycle/products/product-71d140919af5fd66c4c54c3dffa2c9ee.png",
+              "alt": "img2"
+            },
+            {
+              "url": "https://res.cloudinary.com/djrksfqkh/image/upload/v1774519985/fedicycle/products/product-b0872eb5fe7afe03799dc587158436c6.jpg",
+              "alt": "img3"
+            }
+          ]
+        }
+      ],
+      "pricing": {
+        "unit": "M2",
+        "currency": "GBP",
+        "cutout": 26.39,
+        "std": {
+          "exc": 121.79,
+          "inc": 252.53
+        },
+        "ovr": {
+          "exc": 148.71,
+          "inc": 387.87
+        }
+      }
+    },
+    {
+      "_id": "69c5f3d6fccbfe7671f0225e",
+      "name": "Toughened Coloured Glass",
+      "slug": "toughened-coloured-glass",
+      "title": "Toughened Coloured Glass",
+      "glassType": "TOUGHENED_COLOURED",
+      "isAvailable": true,
+      "colorImageGroups": [
+        {
+          "colors": {
+            "key": "coloured",
+            "label": "Coloured",
+            "hexCode": "#cccccc"
+          },
+          "gallery": [
+            {
+              "url": "https://res.cloudinary.com/djrksfqkh/image/upload/v1774519982/fedicycle/products/product-8c8660b00af1fa9ec6cf90d178afbf20.jpg",
+              "alt": "col1"
+            }
+          ]
+        }
+      ],
+      "pricing": {
+        "unit": "M2",
+        "currency": "GBP",
+        "cutout": 26.39,
+        "std": {
+          "exc": 193.19,
+          "inc": 340.73
+        },
+        "ovr": {
+          "exc": 232.07,
+          "inc": 490.84
+        }
+      }
+    },
+    {
+      "_id": "69c5f3d6fccbfe7671f0225f",
+      "name": "Toughened Printed Glass",
+      "slug": "toughened-printed-glass",
+      "title": "Toughened Printed Glass",
+      "glassType": "TOUGHENED_PRINTED",
+      "isAvailable": true,
+      "colorImageGroups": [
+        {
+          "colors": {
+            "key": "printed",
+            "label": "Printed",
+            "hexCode": "#aaaaaa"
+          },
+          "gallery": [
+            {
+              "url": "https://res.cloudinary.com/djrksfqkh/image/upload/v1774519985/fedicycle/products/product-b0872eb5fe7afe03799dc587158436c6.jpg",
+              "alt": "printed"
+            }
+          ]
+        }
+      ],
+      "pricing": {
+        "unit": "M2",
+        "currency": "GBP",
+        "cutout": 26.39,
+        "std": {
+          "exc": 227.46,
+          "inc": 383.07
+        },
+        "ovr": {
+          "exc": 278.31,
+          "inc": 547.96
+        }
+      }
+    },
+    {
+      "_id": "69c5f3d6fccbfe7671f02260",
+      "name": "Toughened Mirror Glass",
+      "slug": "toughened-mirror-glass",
+      "title": "Toughened Mirror Glass",
+      "glassType": "TOUGHENED_MIRROR",
+      "isAvailable": true,
+      "colorImageGroups": [
+        {
+          "colors": {
+            "key": "mirror",
+            "label": "Mirror",
+            "hexCode": "#999999"
+          },
+          "gallery": [
+            {
+              "url": "https://res.cloudinary.com/djrksfqkh/image/upload/v1774519986/fedicycle/products/product-1a1b791109cd13f36bc8642836d92541.webp",
+              "alt": "mirror"
+            }
+          ]
+        }
+      ],
+      "pricing": {
+        "unit": "M2",
+        "currency": "GBP",
+        "cutout": 26.39,
+        "std": {
+          "exc": 202.72,
+          "inc": 352.5
+        },
+        "ovr": {
+          "exc": 241.6,
+          "inc": 502.61
+        }
+      }
+    },
+    {
+      "_id": "69c5f3d6fccbfe7671f02261",
+      "name": "Toughened Antique Mirror",
+      "slug": "toughened-antique-mirror",
+      "title": "Toughened Antique Mirror",
+      "glassType": "TOUGHENED_ANTIQUE_MIRROR",
+      "isAvailable": true,
+      "colorImageGroups": [
+        {
+          "colors": {
+            "key": "antique",
+            "label": "Antique",
+            "hexCode": "#bfa76f"
+          },
+          "gallery": [
+            {
+              "url": "https://res.cloudinary.com/djrksfqkh/image/upload/v1774519988/fedicycle/products/product-28e9e52b5aec105442327505249f15da.webp",
+              "alt": "antique"
+            }
+          ]
+        }
+      ],
+      "pricing": {
+        "unit": "M2",
+        "currency": "GBP",
+        "cutout": 26.39,
+        "std": {
+          "exc": 237,
+          "inc": 394.84
+        },
+        "ovr": {
+          "exc": 287.84,
+          "inc": 559.73
+        }
+      }
+    },
+    {
+      "_id": "69c5f3d6fccbfe7671f02262",
+      "name": "Clear Glass",
+      "slug": "clear-glass",
+      "title": "Clear Glass",
+      "glassType": "CLEAR",
+      "isAvailable": true,
+      "colorImageGroups": [
+        {
+          "colors": {
+            "key": "clear",
+            "label": "Clear",
+            "hexCode": "#ffffff"
+          },
+          "gallery": [
+            {
+              "url": "https://res.cloudinary.com/djrksfqkh/image/upload/v1774519982/fedicycle/products/product-8c8660b00af1fa9ec6cf90d178afbf20.jpg",
+              "alt": "clear"
+            }
+          ]
+        }
+      ],
+      "pricing": {
+        "unit": "M2",
+        "currency": "GBP",
+        "cutout": 26.39,
+        "std": {
+          "exc": 64.91,
+          "inc": 182.27
+        },
+        "ovr": {
+          "exc": 91.83,
+          "inc": 317.6
+        }
+      }
+    },
+    {
+      "_id": "69c5f3d6fccbfe7671f02263",
+      "name": "Coloured Glass",
+      "slug": "coloured-glass",
+      "title": "Coloured Glass",
+      "glassType": "COLOURED",
+      "isAvailable": true,
+      "colorImageGroups": [
+        {
+          "colors": {
+            "key": "coloured",
+            "label": "Coloured",
+            "hexCode": "#cccccc"
+          },
+          "gallery": [
+            {
+              "url": "https://res.cloudinary.com/djrksfqkh/image/upload/v1774519982/fedicycle/products/product-8c8660b00af1fa9ec6cf90d178afbf20.jpg",
+              "alt": "coloured"
+            }
+          ]
+        }
+      ],
+      "pricing": {
+        "unit": "M2",
+        "currency": "GBP",
+        "cutout": 26.39,
+        "std": {
+          "exc": 136.31,
+          "inc": 270.46
+        },
+        "ovr": {
+          "exc": 175.19,
+          "inc": 420.57
+        }
+      }
+    },
+    {
+      "_id": "69c5f3d6fccbfe7671f02264",
+      "name": "Printed Glass",
+      "slug": "printed-glass",
+      "title": "Printed Glass",
+      "glassType": "PRINTED",
+      "isAvailable": true,
+      "colorImageGroups": [
+        {
+          "colors": {
+            "key": "printed",
+            "label": "Printed",
+            "hexCode": "#aaaaaa"
+          },
+          "gallery": [
+            {
+              "url": "https://res.cloudinary.com/djrksfqkh/image/upload/v1774519985/fedicycle/products/product-b0872eb5fe7afe03799dc587158436c6.jpg",
+              "alt": "printed"
+            }
+          ]
+        }
+      ],
+      "pricing": {
+        "unit": "M2",
+        "currency": "GBP",
+        "cutout": 26.39,
+        "std": {
+          "exc": 170.58,
+          "inc": 312.8
+        },
+        "ovr": {
+          "exc": 221.42,
+          "inc": 477.69
+        }
+      }
+    },
+    {
+      "_id": "69c5f3d6fccbfe7671f02265",
+      "name": "Mirror Glass",
+      "slug": "mirror-glass",
+      "title": "Mirror Glass",
+      "glassType": "MIRROR",
+      "isAvailable": true,
+      "colorImageGroups": [
+        {
+          "colors": {
+            "key": "mirror",
+            "label": "Mirror",
+            "hexCode": "#999999"
+          },
+          "gallery": [
+            {
+              "url": "https://res.cloudinary.com/djrksfqkh/image/upload/v1774519986/fedicycle/products/product-1a1b791109cd13f36bc8642836d92541.webp",
+              "alt": "mirror"
+            }
+          ]
+        }
+      ],
+      "pricing": {
+        "unit": "M2",
+        "currency": "GBP",
+        "cutout": 26.39,
+        "std": {
+          "exc": 145.84,
+          "inc": 282.24
+        },
+        "ovr": {
+          "exc": 184.72,
+          "inc": 432.35
+        }
+      }
+    },
+    {
+      "_id": "69c5f3d6fccbfe7671f02266",
+      "name": "Antique Mirror",
+      "slug": "antique-mirror",
+      "title": "Antique Mirror",
+      "glassType": "ANTIQUE_MIRROR",
+      "isAvailable": true,
+      "colorImageGroups": [
+        {
+          "colors": {
+            "key": "antique",
+            "label": "Antique",
+            "hexCode": "#bfa76f"
+          },
+          "gallery": [
+            {
+              "url": "https://res.cloudinary.com/djrksfqkh/image/upload/v1774519988/fedicycle/products/product-28e9e52b5aec105442327505249f15da.webp",
+              "alt": "antique"
+            }
+          ]
+        }
+      ],
+      "pricing": {
+        "unit": "M2",
+        "currency": "GBP",
+        "cutout": 26.39,
+        "std": {
+          "exc": 180.11,
+          "inc": 324.58
+        },
+        "ovr": {
+          "exc": 230.96,
+          "inc": 489.47
+        }
+      }
+    }
+  ]
+}
