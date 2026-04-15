@@ -27,7 +27,7 @@ export const emailHelper = async ({
       },
     });
     const mailOptions = {
-      from: process.env.EMAIL_FROM || `"Fedicycle" <${config.email_from}>`,
+      from: process.env.EMAIL_FROM || `"RYDR" <${config.email_from}>`,
       to,
       subject,
       text: message || '',
