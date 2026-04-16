@@ -1,20 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from "http-status";
-import config from "../../config";
-import sendResponse from "../../utils/sendResponse";
-import { AuthServices } from "./auth.service";
-import { catchAsync } from "../../utils/catchAsync";
-import { generateOTP } from "../../utils/authHelper";
+import config from "../../../config";
+import sendResponse from "../../../utils/sendResponse";
+import { AuthServices } from "./rydr.onboarding.service";
+import { catchAsync } from "../../../utils/catchAsync";
+import { generateOTP } from "../../../utils/authHelper";
 import { Request, Response, CookieOptions } from "express";
-import { emailHelper } from "../../utils/emailHelper";
-import { otpEmailTemplate } from "../../../views/email.views";
-import AppError from "../../errors/AppError";
-
-// cookie options used throughout auth endpoints. need same options when
-// clearing; mismatched sameSite value was preventing logout cookies from
-// being removed in cross‑site scenarios. the frontend must also send
-// credentials (fetch/axios with `credentials: 'include'` or
-// `withCredentials: true`).
+import { emailHelper } from "../../../utils/emailHelper";
+import { otpEmailTemplate } from "../../../../views/email.views";
+import AppError from "../../../errors/AppError";
+ 
 const cookieOptions: CookieOptions = {
   // secure: true,
   secure: config.NODE_ENV === "production",
@@ -22,18 +17,17 @@ const cookieOptions: CookieOptions = {
   sameSite: config.NODE_ENV === "production" ? "none" : "lax",
 };
 
-const registerUser = catchAsync(async (req: Request, res: Response) => {
+const rydrOnboarding = catchAsync(async (req: Request, res: Response) => {
   const body = req.body;
-  const email_otp = generateOTP();
+  const phone_otp = generateOTP();
   const payload = {
     ...body,
-    email_otp,
+    phone_otp,
     otpExpiresAt: new Date(
       Date.now() + config.email_otp_expiration_minutes * 60 * 1000,
     ),
   };
-  const { refreshToken, accessToken, newUser } =
-    await AuthServices.registerUser(payload);
+  const { refreshToken, accessToken, user } = await AuthServices.rydrOnboarding(payload);
 
   res.cookie("refreshToken", refreshToken, cookieOptions);
   res.cookie("accessToken", accessToken, cookieOptions);
@@ -42,13 +36,13 @@ const registerUser = catchAsync(async (req: Request, res: Response) => {
   const html = otpEmailTemplate({
     title: "Verify Your Email",
     email_otp,
-    name: newUser.name,
+    name: user.name,
     expiresMinutes: config.email_otp_expiration_minutes,
     footer: "Fedicycle Security Team",
   });
 
   const result = await emailHelper({
-    to: newUser.email,
+    to: user.email,
     subject: "🔐 Verify Your Email - Fedicycle",
     message: `Your email verification email_otp is ${email_otp}. It will expire in ${config.email_otp_expiration_minutes} minutes.`,
     html,
@@ -241,8 +235,8 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const AuthControllers = {
-  registerUser,
+export const RydrOnboardingControllers = {
+  rydrOnboarding,
   verifyOTP,
   resendOtp,
   loginUser,

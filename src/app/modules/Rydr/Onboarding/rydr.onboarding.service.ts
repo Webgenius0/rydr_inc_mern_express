@@ -2,57 +2,85 @@
 import bcrypt from "bcryptjs";
 import httpStatus from "http-status";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import config from "../../config";
-import AppError from "../../errors/AppError";
-import { createToken } from "../../utils/verifyJWT";
-import { USER_ROLE } from "../User/user.constant";
-import {
-  createUserActivity,
-  createUserActivityPush,
-} from "../User/user.activity";
-import { User } from "../User/user.model";
-import { TLoginUser, TRegisterUser } from "./auth.interface";
-import { getOTPExpiryDate } from "../../utils/dateHelper";
+import config from "../../../config";
+import AppError from "../../../errors/AppError";
+
+import { USER_ROLE } from "../../User/user.constant";
+
+import { User } from "../../User/user.model";
+
+import { getOTPExpiryDate } from "../../../utils/dateHelper";
 import crypto from "crypto";
-const registerUser = async (payload: TRegisterUser) => {
+import { TRydrOnboarding } from "./rydr.onboarding.interface";
+import { generateToken } from "../../User/user.utils";
+
+const rydrOnboarding = async (payload: TRydrOnboarding) => {
   // checking if the user is exist
-  const user = await User.isUserExistsByEmail(payload?.email);
+  //create token and sent to the  client
+
+  const user = await User.findOne({ phone: payload.phone });
 
   if (user) {
-    throw new AppError(httpStatus.NOT_FOUND, "This user is already exist!");
+    if (!user.phone || !user.country || !user.language) {
+      throw new Error("Missing required user fields for token");
+    }
+    const accessToken = generateToken(
+      {
+        phone: user.phone,
+        country: user.country,
+        language: user.language,
+        role: user.role,
+      },
+      config.jwt_access_secret as string,
+      config.jwt_access_expires_in as string,
+    );
+    const refreshToken = generateToken(
+      {
+        phone: user.phone,
+        country: user.country,
+        language: user.language,
+        role: user.role,
+      },
+      config.jwt_refresh_secret as string,
+      config.jwt_refresh_expires_in as string,
+    );
+    return { accessToken, refreshToken, user };
   }
 
-  payload.role = USER_ROLE.CUSTOMER;
+  payload.role = USER_ROLE.USER;
 
   //create new user
   const newUser = await User.create(payload);
 
-  //create token and sent to the  client
+    if (!newUser.phone || !newUser.country || !newUser.language) {
+      throw new Error("Missing required user fields for token");
+    }
 
-  const jwtPayload = {
-    _id: newUser._id,
-    name: newUser.name,
-    email: newUser.email,
-    role: newUser.role,
-    status: newUser.status,
-  };
-
-  const accessToken = createToken(
-    jwtPayload,
-    config.jwt_access_secret as string,
-    config.jwt_access_expires_in as string,
-  );
-
-  const refreshToken = createToken(
-    jwtPayload,
-    config.jwt_refresh_secret as string,
-    config.jwt_refresh_expires_in as string,
-  );
+     const accessToken = generateToken(
+      {
+        phone: newUser.phone,
+        country: newUser.country,
+        language: newUser.language,
+        role: newUser.role,
+      },
+      config.jwt_access_secret as string,
+      config.jwt_access_expires_in as string,
+    );
+    const refreshToken = generateToken(
+      {
+        phone: newUser.phone,
+        country: newUser.country,
+        language: newUser.language,
+        role: newUser.role,
+      },
+      config.jwt_refresh_secret as string,
+      config.jwt_refresh_expires_in as string,
+    );
 
   return {
     accessToken,
     refreshToken,
-    newUser,
+    user: newUser,
   };
 };
 
@@ -113,66 +141,66 @@ const updateUserOtp = async (
   return updatedUser;
 };
 
-const loginUser = async (payload: TLoginUser) => {
-  // checking if the user is exist
-  const user = await User.isUserExistsByEmail(payload?.email);
+// const loginUser = async (payload: ) => {
+//   // checking if the user is exist
+//   const user = await User.isUserExistsByEmail(payload?.email);
 
-  if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "This user is not found!");
-  }
+//   if (!user) {
+//     throw new AppError(httpStatus.NOT_FOUND, "This user is not found!");
+//   }
 
-  // checking if the user is blocked
+//   // checking if the user is blocked
 
-  const userStatus = user?.status;
+//   const userStatus = user?.status;
 
-  if (userStatus === "BLOCKED") {
-    throw new AppError(httpStatus.FORBIDDEN, "This user is blocked!");
-  }
+//   if (userStatus === "BLOCKED") {
+//     throw new AppError(httpStatus.FORBIDDEN, "This user is blocked!");
+//   }
 
-  //checking if the password is correct
+//   //checking if the password is correct
 
-  if (!(await User.isPasswordMatched(payload?.password, user?.password)))
-    throw new AppError(httpStatus.FORBIDDEN, "Password do not matched");
+//   if (!(await User.isPasswordMatched(payload?.password, user?.password)))
+//     throw new AppError(httpStatus.FORBIDDEN, "Password do not matched");
 
-  //create token and sent to the  client
+//   //create token and sent to the  client
 
-  const jwtPayload = {
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    mobileNumber: user.mobileNumber,
-    role: user.role,
-    status: user.status,
-  };
+//   const jwtPayload = {
+//     _id: user._id,
+//     name: user.name,
+//     email: user.email,
+//     mobileNumber: user.mobileNumber,
+//     role: user.role,
+//     status: user.status,
+//   };
 
-  const accessToken = createToken(
-    jwtPayload,
-    config.jwt_access_secret as string,
-    config.jwt_access_expires_in as string,
-  );
+//   const accessToken = createToken(
+//     jwtPayload,
+//     config.jwt_access_secret as string,
+//     config.jwt_access_expires_in as string,
+//   );
 
-  const refreshToken = createToken(
-    jwtPayload,
-    config.jwt_refresh_secret as string,
-    config.jwt_refresh_expires_in as string,
-  );
+//   const refreshToken = createToken(
+//     jwtPayload,
+//     config.jwt_refresh_secret as string,
+//     config.jwt_refresh_expires_in as string,
+//   );
 
-  const loginAt = new Date();
+//   const loginAt = new Date();
 
-  await User.findByIdAndUpdate(user._id, {
-    $set: { lastLoginAt: loginAt },
-    $push: {
-      activityLogs: createUserActivityPush(
-        createUserActivity("LAST_LOGIN", loginAt),
-      ),
-    },
-  });
+//   await User.findByIdAndUpdate(user._id, {
+//     $set: { lastLoginAt: loginAt },
+//     $push: {
+//       activityLogs: createUserActivityPush(
+//         createUserActivity("LAST_LOGIN", loginAt),
+//       ),
+//     },
+//   });
 
-  return {
-    accessToken,
-    refreshToken,
-  };
-};
+//   return {
+//     accessToken,
+//     refreshToken,
+//   };
+// };
 
 const forgotPassword = async (email: string, email_otp: string) => {
   const user = await User.findOne({ email });
@@ -377,7 +405,7 @@ const refreshToken = async (token: string) => {
 };
 
 export const AuthServices = {
-  registerUser,
+  rydrOnboarding,
   verifyOTP,
   updateUserOtp,
   loginUser,
