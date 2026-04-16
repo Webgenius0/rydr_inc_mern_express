@@ -56,24 +56,24 @@ const registerUser = async (payload: TRegisterUser) => {
   };
 };
 
-const verifyOTP = async (otp: string, email: string) => {
+const verifyOTP = async (email_otp: string, email: string) => {
   const user = await User.findOne({ email });
-  if (!user || !user.otp) {
+  if (!user || !user.email_otp) {
     throw new AppError(
       httpStatus.NOT_FOUND,
-      "User not found or no OTP requested!",
+      "User not found or no email_otp requested!",
     );
   }
 
-  const isOtpValid = user.otp === otp;
+  const isOtpValid = user.email_otp === email_otp;
   const isNotExpired = new Date(user.otpExpiresAt as Date) > new Date();
 
   if (!isOtpValid) {
-    throw new AppError(400, "Invalid OTP");
+    throw new AppError(400, "Invalid email_otp");
   }
 
   if (!isNotExpired) {
-    throw new AppError(400, "OTP has expired");
+    throw new AppError(400, "email_otp has expired");
   }
 
   const verifiedAt = new Date();
@@ -81,7 +81,7 @@ const verifyOTP = async (otp: string, email: string) => {
   await User.findOneAndUpdate(
     { email },
     {
-      $unset: { otp: 1, otpExpiresAt: 1 },
+      $unset: { email_otp: 1, otpExpiresAt: 1 },
       $set: { isVerified: true },
       $push: {
         activityLogs: createUserActivityPush(
@@ -94,7 +94,7 @@ const verifyOTP = async (otp: string, email: string) => {
 };
 const updateUserOtp = async (
   email: string,
-  payload: { otp: string; otpExpiresAt: Date },
+  payload: { email_otp: string; otpExpiresAt: Date },
 ) => {
   const user = await User.findOne({ email });
 
@@ -174,20 +174,20 @@ const loginUser = async (payload: TLoginUser) => {
   };
 };
 
-const forgotPassword = async (email: string, otp: string) => {
+const forgotPassword = async (email: string, email_otp: string) => {
   const user = await User.findOne({ email });
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
 
   if (
-    user.otp &&
+    user.email_otp &&
     user.otpExpiresAt &&
     new Date() < new Date(user.otpExpiresAt)
   ) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "An OTP has already been sent. Please wait until it expires or check your email.",
+      "An email_otp has already been sent. Please wait until it expires or check your email.",
     );
   }
   const otpExpiresAt = getOTPExpiryDate(
@@ -198,7 +198,7 @@ const forgotPassword = async (email: string, otp: string) => {
     { email },
     {
       $set: {
-        otp: otp,
+        email_otp: email_otp,
         otpExpiresAt: otpExpiresAt,
       },
     },
@@ -212,19 +212,23 @@ const forgotPassword = async (email: string, otp: string) => {
   return { user: updatedUser };
 };
 
-const forgotPasswordVerifyOTP = async (otp: string, email: string) => {
+const forgotPasswordVerifyOTP = async (email_otp: string, email: string) => {
   const user = await User.findOne({ email });
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
-  const userOtp = (user as any).otp;
+  const userOtp = (user as any).email_otp;
   const userOtpExpiresAt = (user as any).otpExpiresAt;
 
-  if (!userOtp || userOtp !== otp || new Date() > new Date(userOtpExpiresAt)) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid or expired OTP");
+  if (
+    !userOtp ||
+    userOtp !== email_otp ||
+    new Date() > new Date(userOtpExpiresAt)
+  ) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid or expired email_otp");
   }
   const resetToken = (user as any).createPasswordResetToken();
-  (user as any).otp = undefined;
+  (user as any).email_otp = undefined;
   (user as any).otpExpiresAt = undefined;
 
   await user.save({ validateBeforeSave: false });

@@ -20,7 +20,7 @@ const registerValidationSchema = z.object({
 });
 const verifyOTPValidationSchema = z.object({
   body: z.object({
-    otp: z.string({ required_error: "otp is required" }),
+    email_otp: z.string({ required_error: "email_otp is required" }),
     email: z.string({ required_error: "Email is required" }),
   }),
 });

@@ -25,7 +25,7 @@ type TUserRecord = TUser & {
 };
 
 const SAFE_USER_SELECT =
-  "-__v -otp -otpExpiresAt -passwordResetToken -passwordResetExpires";
+  "-__v -email_otp -otpExpiresAt -passwordResetToken -passwordResetExpires";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
@@ -93,7 +93,7 @@ const mapCreatedFilter = (value: unknown): string => {
     TODAY: "TODAY",
     YESTERDAY: "YESTERDAY",
     LAST7DAYS: "LAST_7_DAYS",
-    "LAST_7_DAYS": "LAST_7_DAYS",
+    LAST_7_DAYS: "LAST_7_DAYS",
     THISMONTH: "THIS_MONTH",
     THIS_MONTH: "THIS_MONTH",
     CUSTOM: "CUSTOM",
@@ -365,7 +365,7 @@ const getAllUsersFromDB = async (
 
 const getMe = async (id: string) => {
   const user = await User.findById(id).select(
-    "-password -refreshToken -__v -otp -otpExpiresAt -passwordResetToken -passwordResetExpiresAt  -passwordChangedAt",
+    "-password -refreshToken -__v -email_otp -otpExpiresAt -passwordResetToken -passwordResetExpiresAt  -passwordChangedAt",
   );
   return user;
 };

@@ -24,10 +24,10 @@ const cookieOptions: CookieOptions = {
 
 const registerUser = catchAsync(async (req: Request, res: Response) => {
   const body = req.body;
-  const otp = generateOTP();
+  const email_otp = generateOTP();
   const payload = {
     ...body,
-    otp,
+    email_otp,
     otpExpiresAt: new Date(
       Date.now() + config.email_otp_expiration_minutes * 60 * 1000,
     ),
@@ -38,10 +38,10 @@ const registerUser = catchAsync(async (req: Request, res: Response) => {
   res.cookie("refreshToken", refreshToken, cookieOptions);
   res.cookie("accessToken", accessToken, cookieOptions);
 
-  // Send Otp to user
+  // Send email_otp to user
   const html = otpEmailTemplate({
     title: "Verify Your Email",
-    otp,
+    email_otp,
     name: newUser.name,
     expiresMinutes: config.email_otp_expiration_minutes,
     footer: "Fedicycle Security Team",
@@ -50,7 +50,7 @@ const registerUser = catchAsync(async (req: Request, res: Response) => {
   const result = await emailHelper({
     to: newUser.email,
     subject: "🔐 Verify Your Email - Fedicycle",
-    message: `Your email verification OTP is ${otp}. It will expire in ${config.email_otp_expiration_minutes} minutes.`,
+    message: `Your email verification email_otp is ${email_otp}. It will expire in ${config.email_otp_expiration_minutes} minutes.`,
     html,
   });
 
@@ -59,7 +59,7 @@ const registerUser = catchAsync(async (req: Request, res: Response) => {
       statusCode: httpStatus.OK,
       success: true,
       message:
-        "An OTP has been sent to your email for verification. Please check your inbox.",
+        "An email_otp has been sent to your email for verification. Please check your inbox.",
       data: {
         accessToken,
         refreshToken,
@@ -68,8 +68,8 @@ const registerUser = catchAsync(async (req: Request, res: Response) => {
   }
 });
 const verifyOTP = catchAsync(async (req: Request, res: Response) => {
-  const { otp, email } = req.body;
-  const result = await AuthServices.verifyOTP(otp, email);
+  const { email_otp, email } = req.body;
+  const result = await AuthServices.verifyOTP(email_otp, email);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -98,19 +98,19 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 const resendOtp = catchAsync(async (req: Request, res: Response) => {
   const { email } = req.body;
 
-  const otp = generateOTP();
+  const email_otp = generateOTP();
   const otpExpiresAt = new Date(
     Date.now() + config.email_otp_expiration_minutes * 60 * 1000,
   );
 
   const user = await AuthServices.updateUserOtp(email, {
-    otp,
+    email_otp,
     otpExpiresAt,
   });
 
   const html = otpEmailTemplate({
     title: "Resend Verification Code",
-    otp,
+    email_otp,
     name: user?.name as string,
     expiresMinutes: config.email_otp_expiration_minutes,
     footer: "Fedicycle Security Team",
@@ -118,8 +118,8 @@ const resendOtp = catchAsync(async (req: Request, res: Response) => {
 
   const result = await emailHelper({
     to: user?.email as string,
-    subject: "🔐 Resend OTP - Fedicycle",
-    message: `Your new verification OTP is ${otp}. It will expire in ${config.email_otp_expiration_minutes} minutes.`,
+    subject: "🔐 Resend email_otp - Fedicycle",
+    message: `Your new verification email_otp is ${email_otp}. It will expire in ${config.email_otp_expiration_minutes} minutes.`,
     html,
   });
 
@@ -128,7 +128,7 @@ const resendOtp = catchAsync(async (req: Request, res: Response) => {
       statusCode: httpStatus.OK,
       success: true,
       message:
-        "A new OTP has been sent to your email. Please check your inbox.",
+        "A new email_otp has been sent to your email. Please check your inbox.",
       data: null,
     });
   }
@@ -136,48 +136,48 @@ const resendOtp = catchAsync(async (req: Request, res: Response) => {
 
 const forgotPassword = catchAsync(async (req: Request, res: Response) => {
   const { email } = req.body;
-  const otp = generateOTP();
-  const { user } = await AuthServices.forgotPassword(email, otp);
+  const email_otp = generateOTP();
+  const { user } = await AuthServices.forgotPassword(email, email_otp);
 
   const html = otpEmailTemplate({
     title: "Reset Your Password",
-    otp,
+    email_otp,
     name: user?.name,
     expiresMinutes: config.email_otp_expiration_minutes,
   });
 
   await emailHelper({
     to: email,
-    subject: "🔐 Reset Password OTP - Fedicycle",
+    subject: "🔐 Reset Password email_otp - Fedicycle",
     html,
   });
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "OTP sent to your email. (Field added dynamically)",
+    message: "email_otp sent to your email. (Field added dynamically)",
     data: null,
   });
 });
 
 const forgotPasswordVerifyOTP = catchAsync(
   async (req: Request, res: Response) => {
-    const { email, otp } = req.body;
-    if (!email || !otp) {
+    const { email, email_otp } = req.body;
+    if (!email || !email_otp) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
-        `${!email ? "Email" : "OTP"} is required`,
+        `${!email ? "Email" : "email_otp"} is required`,
       );
     }
     const { resetToken } = await AuthServices.forgotPasswordVerifyOTP(
-      otp,
+      email_otp,
       email,
     );
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
-      message: "OTP verified. Reset token set in cookie.",
+      message: "email_otp verified. Reset token set in cookie.",
       data: { resetToken },
     });
   },

@@ -15,12 +15,12 @@ router.post(
   AuthControllers.registerUser,
 );
 router.post(
-  "/verify-otp",
+  "/verify-email_otp",
   validateRequest(AuthValidation.verifyOTPValidationSchema),
   AuthControllers.verifyOTP,
 );
 router.post(
-  "/resend-otp",
+  "/resend-email_otp",
   validateRequest(AuthValidation.resendOtpValidationSchema),
   AuthControllers.resendOtp,
 );
@@ -37,7 +37,7 @@ router.post(
   AuthControllers.forgotPassword,
 );
 router.post(
-  "/forgot-password-verify-otp",
+  "/forgot-password-verify-email_otp",
   validateRequest(AuthValidation.verifyOTPValidationSchema),
   AuthControllers.forgotPasswordVerifyOTP,
 );

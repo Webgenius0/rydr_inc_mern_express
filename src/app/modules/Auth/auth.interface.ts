@@ -1,4 +1,4 @@
-import { USER_ROLE } from '../User/user.constant';
+import { USER_ROLE } from "../User/user.constant";
 
 export type TLoginUser = {
   email: string;
@@ -15,7 +15,7 @@ export type TRegisterUser = {
 
 export type TOtpEmailTemplateParams = {
   title?: string;
-  otp: string;
+  email_otp: string;
   expiresMinutes?: number;
   footer?: string;
   name?: string;

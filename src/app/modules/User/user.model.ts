@@ -1,11 +1,11 @@
 /* eslint-disable no-useless-escape */
-import bcryptjs from 'bcryptjs';
-import { Schema, model } from 'mongoose';
-import config from '../../config';
-import { USER_ROLE, USER_STATUS } from './user.constant';
-import { IUserModel, TUser } from './user.interface';
-import crypto from 'crypto';
-import { createUserActivity } from './user.activity';
+import bcryptjs from "bcryptjs";
+import { Schema, model } from "mongoose";
+import config from "../../config";
+import { USER_ROLE, USER_STATUS } from "./user.constant";
+import { IUserModel, TUser } from "./user.interface";
+import crypto from "crypto";
+import { createUserActivity } from "./user.activity";
 const userSchema = new Schema<TUser, IUserModel>(
   {
     name: {
@@ -23,7 +23,7 @@ const userSchema = new Schema<TUser, IUserModel>(
       //validate email
       match: [
         /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
-        'Please fill a valid email address',
+        "Please fill a valid email address",
       ],
     },
     password: {
@@ -58,7 +58,7 @@ const userSchema = new Schema<TUser, IUserModel>(
       type: String,
       default: null,
     },
-    otp: { type: String },
+    email_otp: { type: String },
     otpExpiresAt: { type: Date },
     passwordResetToken: { type: String },
     passwordResetExpires: { type: Date },
@@ -82,11 +82,10 @@ const userSchema = new Schema<TUser, IUserModel>(
   },
 );
 
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
 
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
-
-  if (!this.password) return next(new Error('Password is required'));
+  if (!this.password) return next(new Error("Password is required"));
 
   this.password = await bcryptjs.hash(
     this.password,
@@ -96,23 +95,22 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-userSchema.pre('save', function (next) {
+userSchema.pre("save", function (next) {
   if (this.isNew && (!this.activityLogs || this.activityLogs.length === 0)) {
     const createdAt = this.createdAt ?? new Date();
-    this.activityLogs = [createUserActivity('ACCOUNT_CREATED', createdAt)];
+    this.activityLogs = [createUserActivity("ACCOUNT_CREATED", createdAt)];
   }
 
   next();
 });
 
-
-userSchema.post('save', function (doc, next) {
-  doc.password = '';
+userSchema.post("save", function (doc, next) {
+  doc.password = "";
   next();
 });
 
 userSchema.statics.isUserExistsByEmail = async function (email: string) {
-  return await User.findOne({ email }).select('+password');
+  return await User.findOne({ email }).select("+password");
 };
 
 userSchema.statics.isPasswordMatched = async function (
@@ -143,5 +141,4 @@ userSchema.methods.createPasswordResetToken = function () {
   return resetToken;
 };
 
-
-export const User = model<TUser, IUserModel>('User', userSchema);
+export const User = model<TUser, IUserModel>("User", userSchema);
