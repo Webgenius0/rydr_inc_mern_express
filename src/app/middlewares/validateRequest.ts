@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { AnyZodObject } from 'zod';
 import { catchAsync } from '../utils/catchAsync';
+
 const validateRequest = (schema: AnyZodObject) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     if (req.body.product && typeof req.body.product === 'string') {
@@ -9,7 +10,6 @@ const validateRequest = (schema: AnyZodObject) => {
     if (req.body.galleryUploadMap && typeof req.body.galleryUploadMap === 'string') {
       req.body.galleryUploadMap = JSON.parse(req.body.galleryUploadMap);
     }
-
     const parsed = await schema.parseAsync({
       body: req.body,
       query: req.query,
