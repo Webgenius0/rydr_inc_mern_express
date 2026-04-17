@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { FaqService } from "./faq.service";
-import { catchAsync } from "../../utils/catchAsync";
-import sendResponse from "../../utils/sendResponse";
+import { catchAsync } from "../../../utils/catchAsync";
+import sendResponse from "../../../utils/sendResponse";
 
 const createFaq = catchAsync(async (req: Request, res: Response) => {
     const result = await FaqService.createFaq(req.body);

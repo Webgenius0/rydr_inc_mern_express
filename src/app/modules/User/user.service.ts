@@ -1,28 +1,12 @@
 /* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import httpStatus from "http-status";
-import { FilterQuery, Types } from "mongoose";
+import { Types } from "mongoose";
 import AppError from "../../errors/AppError";
-import { UserSearchableFields } from "./user.constant";
-import {
-  TPaginatedUserActivity,
-  TPaginatedUsers,
-  TUser,
-  TUserActivityItem,
-  TUserDetail,
-  TUserListQuery,
-  TUserListItem,
-  TUserStatusUpdateResponse,
-} from "./user.interface";
+import { TUser } from "./user.interface";
 import { User } from "./user.model";
-import { createUserActivity, createUserActivityPush } from "./user.activity";
 import { uploadBufferToCloudinary } from "../../utils/cloudinary.service";
 import { deleteImageByUrl } from "../../shared/upload/deleteImage";
-type TUserRecord = TUser & {
-  _id: Types.ObjectId;
-  createdAt?: Date;
-  updatedAt?: Date;
-};
 
 const SAFE_USER_SELECT =
   "-__v -email_otp -otpExpiresAt -passwordResetToken -passwordResetExpires";
@@ -30,7 +14,6 @@ const SAFE_USER_SELECT =
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
-const DISPLAY_ID_REGEX = /^usr_(\d+)$/i;
 
 const createUser = async (payload: TUser) => {
   const user = await User.create(payload);
@@ -50,142 +33,28 @@ const parsePositiveNumber = (value: unknown, fallback: number) => {
 const normalizeString = (value: unknown) =>
   typeof value === "string" ? value.trim() : "";
 
-const toBoolean = (value: unknown) => {
-  if (typeof value === "boolean") {
-    return value;
-  }
-
-  if (typeof value === "string") {
-    if (value.toLowerCase() === "true") return true;
-    if (value.toLowerCase() === "false") return false;
-  }
-
-  return undefined;
-};
-
 const isAllFilter = (value: unknown) =>
   normalizeString(value).toUpperCase() === "ALL";
 
-const getDayRange = (date: Date) => {
-  const start = new Date(date);
-  start.setHours(0, 0, 0, 0);
-
-  const end = new Date(date);
-  end.setHours(23, 59, 59, 999);
-
-  return { start, end };
-};
-
-const toDate = (value: unknown) => {
-  const rawValue = normalizeString(value);
-
-  if (!rawValue) {
-    return null;
-  }
-
-  const parsed = new Date(rawValue);
-  return Number.isNaN(parsed.getTime()) ? null : parsed;
-};
-
-const mapCreatedFilter = (value: unknown): string => {
-  const raw = normalizeString(value).toUpperCase();
-  const mapping: Record<string, string> = {
-    TODAY: "TODAY",
-    YESTERDAY: "YESTERDAY",
-    LAST7DAYS: "LAST_7_DAYS",
-    LAST_7_DAYS: "LAST_7_DAYS",
-    THISMONTH: "THIS_MONTH",
-    THIS_MONTH: "THIS_MONTH",
-    CUSTOM: "CUSTOM",
-    ALL: "ALL",
-  };
-  return mapping[raw] ?? "";
-};
-
-const buildUserFilters = async (query: TUserListQuery) => {
-  const filter: FilterQuery<TUserRecord> = {};
+const buildUserFilters = async (query: Record<string, unknown>) => {
+  const filter: Record<string, unknown> = {};
   const searchTerm = normalizeString(query.searchTerm);
-  const role =
-    typeof query.role === "string" && !isAllFilter(query.role)
-      ? query.role
-      : undefined;
-  const status =
-    typeof query.status === "string" && !isAllFilter(query.status)
-      ? query.status
-      : undefined;
-  const isVerified = toBoolean(query.isVerified);
-  const createdFilter = mapCreatedFilter(query.created);
-  const createdFrom = toDate(query.createdFrom);
-  const createdTo = toDate(query.createdTo);
 
   if (searchTerm) {
-    const displayIdMatch = searchTerm.match(DISPLAY_ID_REGEX);
-
-    if (displayIdMatch) {
-      const sequence = Number(displayIdMatch[1]);
-      const user = await User.findOne()
-        .sort({ createdAt: 1, _id: 1 })
-        .skip(Math.max(0, sequence - 1))
-        .select("_id")
-        .lean<{ _id: Types.ObjectId } | null>();
-
-      filter._id = user?._id ?? new Types.ObjectId();
-    } else {
-      filter.$or = UserSearchableFields.map((field) => ({
-        [field]: { $regex: searchTerm, $options: "i" },
-      }));
-    }
+    filter.$or = [
+      { first_name: { $regex: searchTerm, $options: "i" } },
+      { last_name: { $regex: searchTerm, $options: "i" } },
+      { email: { $regex: searchTerm, $options: "i" } },
+      { phone: { $regex: searchTerm, $options: "i" } },
+    ];
   }
 
-  if (role) {
-    filter.role = role;
+  if (query.role && !isAllFilter(query.role)) {
+    filter.role = query.role as string;
   }
 
-  if (status) {
-    filter.status = status;
-  }
-
-  if (typeof isVerified === "boolean") {
-    filter.isVerified = isVerified;
-  }
-
-  if (createdFilter === "CUSTOM" && (createdFrom || createdTo)) {
-    const rangeStart = createdFrom ?? new Date(0);
-    const rangeEnd = createdTo ?? new Date();
-    rangeEnd.setHours(23, 59, 59, 999);
-
-    filter.createdAt = {
-      $gte: rangeStart,
-      $lte: rangeEnd,
-    };
-  } else if (createdFilter && createdFilter !== "ALL") {
-    const now = new Date();
-
-    if (createdFilter === "TODAY") {
-      const { start, end } = getDayRange(now);
-      filter.createdAt = { $gte: start, $lte: end };
-    }
-
-    if (createdFilter === "YESTERDAY") {
-      const yesterday = new Date(now);
-      yesterday.setDate(now.getDate() - 1);
-      const { start, end } = getDayRange(yesterday);
-      filter.createdAt = { $gte: start, $lte: end };
-    }
-
-    if (createdFilter === "LAST_7_DAYS") {
-      const start = new Date(now);
-      start.setDate(now.getDate() - 6);
-      start.setHours(0, 0, 0, 0);
-      filter.createdAt = { $gte: start, $lte: now };
-    }
-
-    if (createdFilter === "THIS_MONTH") {
-      const start = new Date(now.getFullYear(), now.getMonth(), 1);
-      const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-      end.setHours(23, 59, 59, 999);
-      filter.createdAt = { $gte: start, $lte: end };
-    }
+  if (query.status && !isAllFilter(query.status)) {
+    filter.status = query.status as string;
   }
 
   return filter;
@@ -198,12 +67,8 @@ const getSortClause = (query: Record<string, unknown>) => {
     return "createdAt";
   }
 
-  if (sortValue === "name_asc") {
-    return "name";
-  }
-
-  if (sortValue === "name_desc") {
-    return "-name";
+  if (sortValue === "name_asc" || sortValue === "name_desc") {
+    return sortValue === "name_asc" ? "first_name" : "-first_name";
   }
 
   if (sortValue === "last_updated") {
@@ -213,117 +78,25 @@ const getSortClause = (query: Record<string, unknown>) => {
   return typeof query.sortBy === "string" ? query.sortBy : "-createdAt";
 };
 
-const getInitials = (name: string) => {
-  return name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
-    .join("");
-};
-
-const getAccountAgeInDays = (createdAt?: Date) => {
-  if (!createdAt) {
-    return 0;
-  }
-
-  const diffInMs = Date.now() - new Date(createdAt).getTime();
-  return Math.max(0, Math.floor(diffInMs / (1000 * 60 * 60 * 24)));
-};
-
-const formatDisplayId = (sequence: number) =>
-  `usr_${String(sequence).padStart(4, "0")}`;
-
-const getUserSequence = async (user: TUserRecord) => {
-  const createdAt = user.createdAt ?? new Date(0);
-
-  const count = await User.countDocuments({
-    $or: [
-      { createdAt: { $lt: createdAt } },
-      {
-        createdAt,
-        _id: { $lte: user._id },
-      },
-    ],
-  });
-
-  return count;
-};
-
-const formatUserListItem = async (
-  user: TUserRecord,
-): Promise<TUserListItem> => {
-  const sequence = await getUserSequence(user);
-
+const formatUserListItem = (user: any) => {
   return {
-    _id: user._id.toString(),
-    displayId: formatDisplayId(sequence),
-    initials: getInitials(user.name),
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    status: user.status,
-    isVerified: user.isVerified,
-    mobileNumber: user.mobileNumber ?? null,
-    profilePhoto: user.profilePhoto ?? null,
+    _id: user._id?.toString() ?? "",
+    first_name: user.first_name ?? "",
+    last_name: user.last_name ?? "",
+    email: user.email ?? "",
+    phone: user.phone ?? "",
+    role: user.role ?? "USER",
+    status: user.status ?? "ACTIVE",
+    language: user.language ?? "en",
     createdAt: user.createdAt ?? null,
     updatedAt: user.updatedAt ?? null,
   };
 };
 
-const buildActivityLog = (user: TUserRecord): TUserActivityItem[] => {
-  if (user.activityLogs?.length) {
-    return [...user.activityLogs].sort(
-      (current, next) => next.timestamp.getTime() - current.timestamp.getTime(),
-    );
-  }
-
-  const activities: TUserActivityItem[] = [];
-
-  if (user.createdAt) {
-    activities.push(createUserActivity("ACCOUNT_CREATED", user.createdAt));
-  }
-
-  if (user.lastLoginAt) {
-    activities.push(createUserActivity("LAST_LOGIN", user.lastLoginAt));
-  }
-
-  if (user.isVerified && user.updatedAt) {
-    activities.push(createUserActivity("ACCOUNT_VERIFIED", user.updatedAt));
-  }
-
-  if (user.passwordChangedAt) {
-    activities.push(
-      createUserActivity("PASSWORD_CHANGED", user.passwordChangedAt),
-    );
-  }
-
-  if (user.status && user.updatedAt && user.status !== "ACTIVE") {
-    activities.push(
-      createUserActivity("STATUS_UPDATED", user.updatedAt, {
-        title: `Status changed to ${user.status}`,
-        description: `Account status is currently ${user.status}.`,
-      }),
-    );
-  }
-
-  if (
-    user.updatedAt &&
-    user.createdAt &&
-    user.updatedAt.getTime() !== user.createdAt.getTime()
-  ) {
-    activities.push(createUserActivity("PROFILE_UPDATED", user.updatedAt));
-  }
-
-  return activities.sort(
-    (current, next) => next.timestamp.getTime() - current.timestamp.getTime(),
-  );
-};
-
 const getAllUsersFromDB = async (
-  query: TUserListQuery,
+  query: Record<string, unknown>,
   currentUserId: string,
-): Promise<TPaginatedUsers> => {
+) => {
   const page = parsePositiveNumber(query.page, DEFAULT_PAGE);
   const limit = Math.min(
     MAX_LIMIT,
@@ -333,24 +106,19 @@ const getAllUsersFromDB = async (
   const sortBy = getSortClause(query);
   const filter = await buildUserFilters(query);
 
-  filter._id = {
-    ...filter._id,
-    $ne: new Types.ObjectId(currentUserId),
-  };
+  (filter as any)._id = { $ne: new Types.ObjectId(currentUserId) };
 
   const [users, total] = await Promise.all([
-    User.find(filter)
+    User.find(filter as any)
       .select(SAFE_USER_SELECT)
       .sort(sortBy)
       .skip(skip)
       .limit(limit)
-      .lean<TUserRecord[]>(),
-    User.countDocuments(filter),
+      .lean(),
+    User.countDocuments(filter as any),
   ]);
 
-  const items = await Promise.all(
-    users.map((user) => formatUserListItem(user)),
-  );
+  const items = users.map((user: any) => formatUserListItem(user));
 
   return {
     items,
@@ -365,14 +133,14 @@ const getAllUsersFromDB = async (
 
 const getMe = async (id: string) => {
   const user = await User.findById(id).select(
-    "-password -refreshToken -__v -email_otp -otpExpiresAt -passwordResetToken -passwordResetExpiresAt  -passwordChangedAt",
+    "-password -refreshToken -__v -email_otp -otpExpiresAt -passwordResetToken -passwordResetExpiresAt",
   );
   return user;
 };
 
 const updateProfile = async (
   userId: string,
-  payload: any,
+  payload: Partial<TUser>,
   file?: Express.Multer.File,
 ) => {
   const user = await User.findById(userId);
@@ -381,10 +149,9 @@ const updateProfile = async (
     throw new AppError(404, "User not found");
   }
 
-  let profilePhotoUrl = user.profilePhoto;
+  let profilePhotoUrl: string | undefined;
 
   if (file) {
-    // 🔥 upload new image
     const uploadResult = await uploadBufferToCloudinary(file.buffer);
 
     if (!uploadResult || !uploadResult.secure_url) {
@@ -393,9 +160,9 @@ const updateProfile = async (
 
     profilePhotoUrl = uploadResult.secure_url;
 
-    // 🧹 delete old image
-    if (user.profilePhoto) {
-      await deleteImageByUrl(user.profilePhoto).catch(() => null);
+    const existingPhoto = (user as any).profilePhoto;
+    if (existingPhoto) {
+      await deleteImageByUrl(existingPhoto).catch(() => null);
     }
   }
 
@@ -403,7 +170,7 @@ const updateProfile = async (
     userId,
     {
       ...payload,
-      profilePhoto: profilePhotoUrl,
+      ...(profilePhotoUrl && { profilePhoto: profilePhotoUrl }),
     },
     { new: true },
   );
@@ -411,115 +178,43 @@ const updateProfile = async (
   return updated;
 };
 
-const getSingleUser = async (id: string): Promise<TUserDetail> => {
+const getSingleUser = async (id: string) => {
   if (!Types.ObjectId.isValid(id)) {
     throw new AppError(httpStatus.BAD_REQUEST, "Invalid user id");
   }
 
-  const user = await User.findById(id)
-    .select(SAFE_USER_SELECT)
-    .lean<TUserRecord | null>();
+  const user = await User.findById(id).select(SAFE_USER_SELECT).lean();
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found");
   }
 
-  const displayId = formatDisplayId(await getUserSequence(user));
-  const activityLog = buildActivityLog(user);
-  const lastActivityAt =
-    activityLog[0]?.timestamp ?? user.updatedAt ?? user.createdAt ?? null;
-  const lastLoginAt =
-    activityLog.find((activity) => activity.type === "LAST_LOGIN")?.timestamp ??
-    user.lastLoginAt ??
-    null;
-
   return {
-    summary: {
-      _id: user._id.toString(),
-      displayId,
-      initials: getInitials(user.name),
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      status: user.status,
-      isVerified: user.isVerified,
-      profilePhoto: user.profilePhoto ?? null,
-      joinedAt: user.createdAt ?? null,
-      lastUpdatedAt: user.updatedAt ?? null,
-      lastLoginAt,
-      lastActivityAt,
-    },
-    metrics: {
-      accountAgeInDays: getAccountAgeInDays(user.createdAt),
-      totalActivities: activityLog.length,
-      lastActivityAt,
-    },
-    profileInformation: {
-      fullName: user.name,
-      emailAddress: user.email,
-      userRole: user.role,
-      accountStatus: user.status,
-      verified: user.isVerified,
-      mobileNumber: user.mobileNumber ?? null,
-      profilePhoto: user.profilePhoto ?? null,
-    },
-    addressInformation: {
-      address: user.address ?? null,
-    },
-  };
-};
-
-const getUserActivityLog = async (
-  id: string,
-  query: Record<string, unknown>,
-): Promise<TPaginatedUserActivity> => {
-  if (!Types.ObjectId.isValid(id)) {
-    throw new AppError(httpStatus.BAD_REQUEST, "Invalid user id");
-  }
-
-  const user = await User.findById(id)
-    .select(SAFE_USER_SELECT)
-    .lean<TUserRecord | null>();
-
-  if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found");
-  }
-
-  const page = parsePositiveNumber(query.page, DEFAULT_PAGE);
-  const limit = Math.min(
-    MAX_LIMIT,
-    parsePositiveNumber(query.limit, DEFAULT_LIMIT),
-  );
-  const activityLog = buildActivityLog(user);
-  const total = activityLog.length;
-  const start = (page - 1) * limit;
-  const end = start + limit;
-
-  return {
-    items: activityLog.slice(start, end),
-    meta: {
-      total,
-      page,
-      limit,
-      pages: Math.ceil(total / limit) || 1,
-    },
+    _id: user._id?.toString() ?? "",
+    first_name: user.first_name ?? "",
+    last_name: user.last_name ?? "",
+    email: user.email ?? "",
+    phone: user.phone ?? "",
+    role: user.role ?? "USER",
+    status: user.status ?? "ACTIVE",
+    language: user.language ?? "en",
+    country: user.country ?? null,
+    province: user.province ?? null,
+    city: user.city ?? null,
+    preferredService: user.preferredService ?? null,
+    agreed_terms_and_conditions: user.agreed_terms_and_conditions ?? false,
+    createdAt: user.createdAt ?? null,
+    updatedAt: user.updatedAt ?? null,
+    lastLoginAt: user.lastLoginAt ?? null,
   };
 };
 
 const updateUserStatus = async (
   id: string,
   nextStatus: "ACTIVE" | "BLOCKED",
-  actorId: string,
-): Promise<TUserStatusUpdateResponse> => {
+) => {
   if (!Types.ObjectId.isValid(id)) {
     throw new AppError(httpStatus.BAD_REQUEST, "Invalid user id");
-  }
-
-  if (actorId === id && nextStatus === "BLOCKED") {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "You cannot block your own account",
-    );
   }
 
   const user = await User.findById(id).select(SAFE_USER_SELECT);
@@ -535,24 +230,10 @@ const updateUserStatus = async (
     );
   }
 
-  const changedAt = new Date();
-
   const updatedUser = await User.findByIdAndUpdate(
     id,
-    {
-      $set: { status: nextStatus },
-      $push: {
-        activityLogs: createUserActivityPush(
-          createUserActivity("STATUS_UPDATED", changedAt, {
-            title: `Status changed to ${nextStatus}`,
-            description: `Account status changed to ${nextStatus}.`,
-          }),
-        ),
-      },
-    },
-    {
-      new: true,
-    },
+    { status: nextStatus },
+    { new: true },
   ).select(SAFE_USER_SELECT);
 
   if (!updatedUser) {
@@ -561,7 +242,6 @@ const updateUserStatus = async (
 
   return {
     _id: updatedUser._id.toString(),
-    name: updatedUser.name,
     email: updatedUser.email,
     status: updatedUser.status,
     updatedAt: updatedUser.updatedAt ?? null,
@@ -574,6 +254,5 @@ export const UserServices = {
   getMe,
   getSingleUser,
   updateProfile,
-  getUserActivityLog,
   updateUserStatus,
 };

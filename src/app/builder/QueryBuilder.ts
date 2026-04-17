@@ -1,5 +1,13 @@
 /* eslint-disable prefer-const */
-import { FilterQuery, Query } from 'mongoose';
+import type { Query } from 'mongoose';
+
+type FilterQuery<T> = {
+  [key in keyof T]?: unknown;
+} & {
+  $or?: Array<Record<string, unknown>>;
+  $and?: Array<Record<string, unknown>>;
+  $nor?: Array<Record<string, unknown>>;
+};
 
 export class QueryBuilder<T> {
   public query: Record<string, unknown>; //payload
