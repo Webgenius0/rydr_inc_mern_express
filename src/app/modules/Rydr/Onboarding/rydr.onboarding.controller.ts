@@ -9,6 +9,7 @@ import { Request, Response, CookieOptions } from "express";
 import { emailHelper } from "../../../utils/emailHelper";
 import { otpEmailTemplate } from "../../../../views/email.views";
 import AppError from "../../../errors/AppError";
+import { ca } from "zod/v4/locales";
 
 const cookieOptions: CookieOptions = {
   // secure: true,
@@ -55,6 +56,30 @@ const verifyPhoneOTP = catchAsync(async (req: Request, res: Response) => {
     data: { accessToken, refreshToken, user },
   });
 });
+
+const resendPhoneOTP = catchAsync(async (req: Request, res: Response) => {
+  const { phone } = req.body;
+
+  const result = await OnboardingServices.rydrResendPhoneOTP(phone);
+
+  if (!result) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Failed to resend OTP");
+  }
+
+  const { otp, phone_otp_expires_at } = result;
+
+  //TODO Send phone_otp to user via SMS (integration with SMS provider needed)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "A new verification code has been sent to your phone.",
+    data: {
+      otp,
+      phone_otp_expires_at,
+    },
+  });
+});
+
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const result = await OnboardingServices.loginUser(req.body);
   const { refreshToken, accessToken } = result;
@@ -225,4 +250,5 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 export const RydrOnboardingControllers = {
   rydrOnboarding,
   verifyPhoneOTP,
+  resendPhoneOTP,
 };

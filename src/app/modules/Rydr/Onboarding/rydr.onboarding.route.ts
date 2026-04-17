@@ -16,6 +16,13 @@ router.post(
   validateRequest(RydrOnboardingValidation.rydrVerifyPhoneOTPValidationSchema),
   RydrOnboardingControllers.verifyPhoneOTP,
 );
+ 
+router.post(
+  "/resend-phone-otp",
+  validateRequest(RydrOnboardingValidation.rydrResendPhoneOTPValidationSchema),
+  RydrOnboardingControllers.resendPhoneOTP,
+);
+ 
 
 // router.post(
 //   "/change-password",

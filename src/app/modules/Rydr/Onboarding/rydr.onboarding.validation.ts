@@ -14,6 +14,11 @@ const rydrVerifyPhoneOTPValidationSchema = z.object({
     otp: z.string("OTP is required"),
   }),
 });
+const rydrResendPhoneOTPValidationSchema = z.object({
+  body: z.object({
+    phone: z.string("Phone is required"),
+  }),
+});
 
 const rydrCompleteOnboardingValidationSchema = z.object({
   body: z.object({
@@ -39,5 +44,6 @@ const rydrCompleteOnboardingValidationSchema = z.object({
 export const RydrOnboardingValidation = {
   rydrOnboardingValidationSchema,
   rydrVerifyPhoneOTPValidationSchema,
+  rydrResendPhoneOTPValidationSchema,
   rydrCompleteOnboardingValidationSchema,
 };

@@ -102,6 +102,24 @@ const rydrVerifyOnboardingPhoneOTP = async (payload: TRydrVerifyPhoneOTP) => {
   return { accessToken, refreshToken, user };
 };
 
+const rydrResendPhoneOTP = async (phone: string) => {
+  const user = await User.findOne({ phone });
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found!");
+  }
+
+  const otp = generateOTP();
+  const otpExpiresAt = getOTPExpiryDate(
+    Number(config.email_otp_expiration_minutes),
+  );
+  user.phone_otp = otp;
+  user.phone_otp_expires_at = otpExpiresAt;
+  await user.save();
+
+  return { otp, phone_otp_expires_at: otpExpiresAt };
+};
+
 const verifyOTP = async (email_otp: string, email: string) => {
   const user = await User.findOne({ email });
   if (!user || !user.email_otp) {
@@ -425,4 +443,5 @@ const refreshToken = async (token: string) => {
 export const OnboardingServices = {
   rydrOnboarding,
   rydrVerifyOnboardingPhoneOTP,
+  rydrResendPhoneOTP,
 };
