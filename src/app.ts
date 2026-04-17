@@ -45,9 +45,9 @@ app.get("/", (req: Request, res: Response) => {
   res.status(httpStatus.OK).json({
     success: true,
     statusCode: httpStatus.OK,
-    message: "Welcome to Fedicycle API",
+    message: "Welcome to Rydr_Ink API",
     data: {
-      service: "Fedicycle Backend API",
+      service: "Rydr_Ink Backend API",
       version: "1.0.0",
       description: "A robust API for federated cycling management",
       environment: process.env.NODE_ENV || "development",
@@ -72,7 +72,7 @@ app.get("/health", (req: Request, res: Response) => {
       uptime: process.uptime(),
       environment: process.env.NODE_ENV || "development",
       service: {
-        name: "Fedicycle API",
+        name: "Rydr_Ink API",
         version: "1.0.0",
       },
       system: {
