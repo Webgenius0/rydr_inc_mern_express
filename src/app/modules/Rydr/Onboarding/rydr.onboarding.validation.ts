@@ -34,9 +34,15 @@ const rydrCompleteOnboardingValidationSchema = z.object({
           z.number("Longitude must be a number"),
           z.number("Latitude must be a number"),
         ]),
-        updatedAt: z.date().optional(),
+        updatedAt: z.coerce.date().optional(),
       })
       .optional(),
+  }),
+});
+
+const rydrRefreshTokenValidationSchema = z.object({
+  cookies: z.object({
+    refreshToken: z.string("Refresh token is required"),
   }),
 });
 
@@ -45,4 +51,5 @@ export const RydrOnboardingValidation = {
   rydrVerifyPhoneOTPValidationSchema,
   rydrResendPhoneOTPValidationSchema,
   rydrCompleteOnboardingValidationSchema,
+  rydrRefreshTokenValidationSchema,
 };
