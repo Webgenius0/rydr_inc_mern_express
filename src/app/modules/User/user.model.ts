@@ -6,11 +6,9 @@ const userSchema = new Schema<TUser>(
   {
     first_name: {
       type: String,
-      required: true,
     },
     last_name: {
       type: String,
-      required: true,
     },
     phone: {
       type: String,

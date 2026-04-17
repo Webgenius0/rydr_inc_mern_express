@@ -1,12 +1,10 @@
 import { z } from "zod";
-import { USER_ROLE } from "../../User/user.constant";
 
 const rydrOnboardingValidationSchema = z.object({
   body: z.object({
     phone: z.string("Phone is required"),
     country: z.string("Country is required"),
     language: z.string("Language is required"),
-    role: z.enum([USER_ROLE.USER], "Role must be USER"),
   }),
 });
 

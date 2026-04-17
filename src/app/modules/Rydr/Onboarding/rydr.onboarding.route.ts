@@ -11,11 +11,11 @@ router.post(
   validateRequest(RydrOnboardingValidation.rydrOnboardingValidationSchema),
   RydrOnboardingControllers.rydrOnboarding,
 );
-// router.post(
-//   "/verify-email_otp",
-//   validateRequest(AuthValidation.verifyOTPValidationSchema),
-//   AuthControllers.verifyOTP,
-// );
+router.post(
+  "/verify-phone-otp",
+  validateRequest(RydrOnboardingValidation.rydrVerifyPhoneOTPValidationSchema),
+  RydrOnboardingControllers.verifyPhoneOTP,
+);
 
 // router.post(
 //   "/change-password",

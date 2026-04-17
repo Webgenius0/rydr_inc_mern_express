@@ -2,14 +2,14 @@
 import httpStatus from "http-status";
 import config from "../../../config";
 import sendResponse from "../../../utils/sendResponse";
-import { AuthServices } from "./rydr.onboarding.service";
+import { OnboardingServices } from "./rydr.onboarding.service";
 import { catchAsync } from "../../../utils/catchAsync";
 import { generateOTP } from "../../../utils/authHelper";
 import { Request, Response, CookieOptions } from "express";
 import { emailHelper } from "../../../utils/emailHelper";
 import { otpEmailTemplate } from "../../../../views/email.views";
 import AppError from "../../../errors/AppError";
- 
+
 const cookieOptions: CookieOptions = {
   // secure: true,
   secure: config.NODE_ENV === "production",
@@ -19,51 +19,24 @@ const cookieOptions: CookieOptions = {
 
 const rydrOnboarding = catchAsync(async (req: Request, res: Response) => {
   const body = req.body;
-  const phone_otp = generateOTP();
-  const payload = {
-    ...body,
-    phone_otp,
-    otpExpiresAt: new Date(
-      Date.now() + config.email_otp_expiration_minutes * 60 * 1000,
-    ),
-  };
-  const { refreshToken, accessToken, user } = await AuthServices.rydrOnboarding(payload);
 
-  res.cookie("refreshToken", refreshToken, cookieOptions);
-  res.cookie("accessToken", accessToken, cookieOptions);
+  const { otp, phone_otp_expires_at } =
+    await OnboardingServices.rydrOnboarding(body);
 
-  // Send email_otp to user
-  const html = otpEmailTemplate({
-    title: "Verify Your Email",
-    email_otp,
-    name: user.name,
-    expiresMinutes: config.email_otp_expiration_minutes,
-    footer: "Fedicycle Security Team",
+  //TODO Send phone_otp to user via SMS (integration with SMS provider needed)
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "A 6-digit verification code has been sent to your phone.",
+    data: {
+      otp,
+      phone_otp_expires_at,
+    },
   });
-
-  const result = await emailHelper({
-    to: user.email,
-    subject: "🔐 Verify Your Email - Fedicycle",
-    message: `Your email verification email_otp is ${email_otp}. It will expire in ${config.email_otp_expiration_minutes} minutes.`,
-    html,
-  });
-
-  if (result.accepted && result.accepted.length > 0) {
-    sendResponse(res, {
-      statusCode: httpStatus.OK,
-      success: true,
-      message:
-        "An email_otp has been sent to your email for verification. Please check your inbox.",
-      data: {
-        accessToken,
-        refreshToken,
-      },
-    });
-  }
 });
-const verifyOTP = catchAsync(async (req: Request, res: Response) => {
+const verifyPhoneOTP = catchAsync(async (req: Request, res: Response) => {
   const { email_otp, email } = req.body;
-  const result = await AuthServices.verifyOTP(email_otp, email);
+  const result = await OnboardingServices.verifyOTP(email_otp, email);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -72,7 +45,7 @@ const verifyOTP = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const loginUser = catchAsync(async (req: Request, res: Response) => {
-  const result = await AuthServices.loginUser(req.body);
+  const result = await OnboardingServices.loginUser(req.body);
   const { refreshToken, accessToken } = result;
 
   res.cookie("refreshToken", refreshToken, cookieOptions);
@@ -97,7 +70,7 @@ const resendOtp = catchAsync(async (req: Request, res: Response) => {
     Date.now() + config.email_otp_expiration_minutes * 60 * 1000,
   );
 
-  const user = await AuthServices.updateUserOtp(email, {
+  const user = await OnboardingServices.updateUserOtp(email, {
     email_otp,
     otpExpiresAt,
   });
@@ -131,7 +104,7 @@ const resendOtp = catchAsync(async (req: Request, res: Response) => {
 const forgotPassword = catchAsync(async (req: Request, res: Response) => {
   const { email } = req.body;
   const email_otp = generateOTP();
-  const { user } = await AuthServices.forgotPassword(email, email_otp);
+  const { user } = await OnboardingServices.forgotPassword(email, email_otp);
 
   const html = otpEmailTemplate({
     title: "Reset Your Password",
@@ -163,7 +136,7 @@ const forgotPasswordVerifyOTP = catchAsync(
         `${!email ? "Email" : "email_otp"} is required`,
       );
     }
-    const { resetToken } = await AuthServices.forgotPasswordVerifyOTP(
+    const { resetToken } = await OnboardingServices.forgotPasswordVerifyOTP(
       email_otp,
       email,
     );
@@ -187,7 +160,7 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
     );
   }
 
-  await AuthServices.resetPassword(resetToken, newPassword);
+  await OnboardingServices.resetPassword(resetToken, newPassword);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -200,7 +173,7 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
 const changePassword = catchAsync(async (req: Request, res: Response) => {
   const { ...passwordData } = req.body;
 
-  const result = await AuthServices.changePassword(req.user, passwordData);
+  const result = await OnboardingServices.changePassword(req.user, passwordData);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -225,7 +198,7 @@ const logout = catchAsync(async (req: Request, res: Response) => {
 
 const refreshToken = catchAsync(async (req: Request, res: Response) => {
   const { refreshToken } = req.cookies;
-  const result = await AuthServices.refreshToken(refreshToken);
+  const result = await OnboardingServices.refreshToken(refreshToken);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -237,13 +210,5 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 
 export const RydrOnboardingControllers = {
   rydrOnboarding,
-  verifyOTP,
-  resendOtp,
-  loginUser,
-  forgotPassword,
-  forgotPasswordVerifyOTP,
-  resetPassword,
-  changePassword,
-  logout,
-  refreshToken,
+  verifyPhoneOTP,
 };

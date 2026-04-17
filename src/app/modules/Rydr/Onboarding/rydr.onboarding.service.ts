@@ -13,8 +13,46 @@ import { getOTPExpiryDate } from "../../../utils/dateHelper";
 import crypto from "crypto";
 import { TRydrOnboarding } from "./rydr.onboarding.interface";
 import { generateToken } from "../../User/user.utils";
+import { generateOTP } from "../../../utils/authHelper";
 
 const rydrOnboarding = async (payload: TRydrOnboarding) => {
+  // checking if the user is exist
+  // create token and sent to the  client
+
+  const user = await User.findOne({ phone: payload.phone });
+
+  if (user) {
+    if (!user.phone || !user.country || !user.language) {
+      throw new Error("Missing required user fields for token");
+    }
+    const otp = generateOTP();
+    const otpExpiresAt = getOTPExpiryDate(
+      Number(config.email_otp_expiration_minutes),
+    );
+    user.phone_otp = otp;
+    user.phone_otp_expires_at = otpExpiresAt;
+    await user.save();
+
+    return { user, otp, phone_otp_expires_at: otpExpiresAt };
+  }
+
+  //create new user
+  const newUser = await User.create(payload);
+  newUser.role = USER_ROLE.USER;
+  await newUser.save();
+
+  const otp = generateOTP();
+  const otpExpiresAt = getOTPExpiryDate(
+    Number(config.email_otp_expiration_minutes),
+  );
+  newUser.phone_otp = otp;
+  newUser.phone_otp_expires_at = otpExpiresAt;
+  await newUser.save();
+
+  return { user, otp, phone_otp_expires_at: otpExpiresAt };
+};
+
+const rydrVerifyOnboardingPhoneOTP = async (payload: TRydrOnboarding) => {
   // checking if the user is exist
   //create token and sent to the  client
 
@@ -44,6 +82,9 @@ const rydrOnboarding = async (payload: TRydrOnboarding) => {
       config.jwt_refresh_secret as string,
       config.jwt_refresh_expires_in as string,
     );
+    user.refreshToken = refreshToken;
+    await user.save();
+
     return { accessToken, refreshToken, user };
   }
 
@@ -52,30 +93,33 @@ const rydrOnboarding = async (payload: TRydrOnboarding) => {
   //create new user
   const newUser = await User.create(payload);
 
-    if (!newUser.phone || !newUser.country || !newUser.language) {
-      throw new Error("Missing required user fields for token");
-    }
+  if (!newUser.phone || !newUser.country || !newUser.language) {
+    throw new Error("Missing required user fields for token");
+  }
 
-     const accessToken = generateToken(
-      {
-        phone: newUser.phone,
-        country: newUser.country,
-        language: newUser.language,
-        role: newUser.role,
-      },
-      config.jwt_access_secret as string,
-      config.jwt_access_expires_in as string,
-    );
-    const refreshToken = generateToken(
-      {
-        phone: newUser.phone,
-        country: newUser.country,
-        language: newUser.language,
-        role: newUser.role,
-      },
-      config.jwt_refresh_secret as string,
-      config.jwt_refresh_expires_in as string,
-    );
+  const accessToken = generateToken(
+    {
+      phone: newUser.phone,
+      country: newUser.country,
+      language: newUser.language,
+      role: newUser.role,
+    },
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string,
+  );
+  const refreshToken = generateToken(
+    {
+      phone: newUser.phone,
+      country: newUser.country,
+      language: newUser.language,
+      role: newUser.role,
+    },
+    config.jwt_refresh_secret as string,
+    config.jwt_refresh_expires_in as string,
+  );
+
+  newUser.refreshToken = refreshToken;
+  await newUser.save();
 
   return {
     accessToken,
@@ -404,14 +448,7 @@ const refreshToken = async (token: string) => {
   };
 };
 
-export const AuthServices = {
+export const OnboardingServices = {
   rydrOnboarding,
-  verifyOTP,
-  updateUserOtp,
-  loginUser,
-  forgotPassword,
-  forgotPasswordVerifyOTP,
-  resetPassword,
-  changePassword,
-  refreshToken,
+  rydrVerifyOnboardingPhoneOTP,
 };
