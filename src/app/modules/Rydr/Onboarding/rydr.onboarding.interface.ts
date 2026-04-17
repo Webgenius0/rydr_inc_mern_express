@@ -2,7 +2,6 @@ import { TGeoLocation } from "../../User/user.interface";
 
 export type TRydrOnboarding = {
   phone: string;
-  country: string;
   language: string;
 };
 

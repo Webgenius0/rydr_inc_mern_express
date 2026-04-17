@@ -3,7 +3,6 @@ import { z } from "zod";
 const rydrOnboardingValidationSchema = z.object({
   body: z.object({
     phone: z.string("Phone is required"),
-    country: z.string("Country is required"),
     language: z.string("Language is required"),
   }),
 });

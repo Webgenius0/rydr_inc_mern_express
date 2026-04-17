@@ -28,7 +28,7 @@ const rydrOnboarding = async (payload: TRydrOnboarding) => {
   const user = await User.findOne({ phone: payload.phone });
 
   if (user) {
-    if (!user.phone || !user.country || !user.language) {
+    if (!user.phone || !user.language) {
       throw new Error("Missing required user fields for token");
     }
     const otp = generateOTP();
@@ -87,7 +87,7 @@ const rydrVerifyOnboardingPhoneOTP = async (payload: TRydrVerifyPhoneOTP) => {
   user.phone_otp_expires_at = undefined;
   await user.save();
 
-  if (!user.phone || !user.country || !user.language) {
+  if (!user.phone || !user.language) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "Please complete your profile first!",
