@@ -45,11 +45,11 @@ app.get("/", (req: Request, res: Response) => {
   res.status(httpStatus.OK).json({
     success: true,
     statusCode: httpStatus.OK,
-    message: "Welcome to Rydr_Ink API",
+    message: "Welcome to Rydr Backend API",
     data: {
-      service: "Rydr_Ink Backend API",
+      service: "Rydr Backend API",
       version: "1.0.0",
-      description: "A robust API for federated cycling management",
+      description: "Rydr_Ink is a platform that connects customers with local service providers for various services.",
       environment: process.env.NODE_ENV || "development",
       timestamp: new Date().toISOString(),
       endpoints: {
@@ -72,7 +72,7 @@ app.get("/health", (req: Request, res: Response) => {
       uptime: process.uptime(),
       environment: process.env.NODE_ENV || "development",
       service: {
-        name: "Rydr_Ink API",
+        name: "Rydr API",
         version: "1.0.0",
       },
       system: {
