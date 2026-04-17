@@ -15,9 +15,13 @@ export const seed = async () => {
       console.log("Seeding started...");
 
       await User.create({
-        name: "Admin",
-        role: USER_ROLE.ADMIN,
+        first_name: "Admin",
+        last_name: "Admin",
+        phone: "1234567890",
         email: config.admin_email,
+        language: "en",
+        agreed_terms_and_conditions: true,
+        role: USER_ROLE.ADMIN,
         status: USER_STATUS.ACTIVE,
       });
       console.log("Admin created successfully...");
