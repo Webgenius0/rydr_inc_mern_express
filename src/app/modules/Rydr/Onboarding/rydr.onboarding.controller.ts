@@ -35,13 +35,24 @@ const rydrOnboarding = catchAsync(async (req: Request, res: Response) => {
   });
 });
 const verifyPhoneOTP = catchAsync(async (req: Request, res: Response) => {
-  const { email_otp, email } = req.body;
-  const result = await OnboardingServices.verifyOTP(email_otp, email);
+  const payload = req.body;
+
+  const result = await OnboardingServices.rydrVerifyOnboardingPhoneOTP(payload);
+
+  if (!result) {
+    throw new AppError(httpStatus.BAD_REQUEST, "OTP verification failed");
+  }
+
+  const { accessToken, refreshToken, user } = result;
+
+  res.cookie("refreshToken", refreshToken, cookieOptions);
+  res.cookie("accessToken", accessToken, cookieOptions);
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Email verified successfully!",
-    data: result,
+    message: "Phone verified successfully!",
+    data: { accessToken, refreshToken, user },
   });
 });
 const loginUser = catchAsync(async (req: Request, res: Response) => {
@@ -173,7 +184,10 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
 const changePassword = catchAsync(async (req: Request, res: Response) => {
   const { ...passwordData } = req.body;
 
-  const result = await OnboardingServices.changePassword(req.user, passwordData);
+  const result = await OnboardingServices.changePassword(
+    req.user,
+    passwordData,
+  );
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

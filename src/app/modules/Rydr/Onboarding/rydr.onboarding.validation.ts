@@ -10,6 +10,7 @@ const rydrOnboardingValidationSchema = z.object({
 
 const rydrVerifyPhoneOTPValidationSchema = z.object({
   body: z.object({
+    phone: z.string("Phone is required"),
     otp: z.string("OTP is required"),
   }),
 });

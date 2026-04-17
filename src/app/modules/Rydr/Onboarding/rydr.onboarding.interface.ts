@@ -7,6 +7,7 @@ export type TRydrOnboarding = {
 };
 
 export type TRydrVerifyPhoneOTP = {
+  phone: string;
   otp: string;
 };
 

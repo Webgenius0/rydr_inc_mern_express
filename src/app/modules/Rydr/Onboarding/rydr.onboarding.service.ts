@@ -11,8 +11,14 @@ import { User } from "../../User/user.model";
 
 import { getOTPExpiryDate } from "../../../utils/dateHelper";
 import crypto from "crypto";
-import { TRydrOnboarding } from "./rydr.onboarding.interface";
-import { generateToken } from "../../User/user.utils";
+import {
+  TRydrOnboarding,
+  TRydrVerifyPhoneOTP,
+} from "./rydr.onboarding.interface";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../../User/user.utils";
 import { generateOTP } from "../../../utils/authHelper";
 
 const rydrOnboarding = async (payload: TRydrOnboarding) => {
@@ -52,80 +58,48 @@ const rydrOnboarding = async (payload: TRydrOnboarding) => {
   return { user, otp, phone_otp_expires_at: otpExpiresAt };
 };
 
-const rydrVerifyOnboardingPhoneOTP = async (payload: TRydrOnboarding) => {
-  // checking if the user is exist
-  //create token and sent to the  client
+const rydrVerifyOnboardingPhoneOTP = async (payload: TRydrVerifyPhoneOTP) => {
+  console.log({ payload });
+  const result = await User.find({ phone: payload.phone });
+  const user = result[0];
 
-  const user = await User.findOne({ phone: payload.phone });
+  console.log({ result });
 
-  if (user) {
-    if (!user.phone || !user.country || !user.language) {
-      throw new Error("Missing required user fields for token");
-    }
-    const accessToken = generateToken(
-      {
-        phone: user.phone,
-        country: user.country,
-        language: user.language,
-        role: user.role,
-      },
-      config.jwt_access_secret as string,
-      config.jwt_access_expires_in as string,
-    );
-    const refreshToken = generateToken(
-      {
-        phone: user.phone,
-        country: user.country,
-        language: user.language,
-        role: user.role,
-      },
-      config.jwt_refresh_secret as string,
-      config.jwt_refresh_expires_in as string,
-    );
-    user.refreshToken = refreshToken;
-    await user.save();
-
-    return { accessToken, refreshToken, user };
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found!");
   }
 
-  payload.role = USER_ROLE.USER;
-
-  //create new user
-  const newUser = await User.create(payload);
-
-  if (!newUser.phone || !newUser.country || !newUser.language) {
-    throw new Error("Missing required user fields for token");
+  if (
+    user.phone_otp_expires_at &&
+    new Date() > new Date(user.phone_otp_expires_at)
+  ) {
+    throw new AppError(httpStatus.BAD_REQUEST, "OTP has expired!");
   }
 
-  const accessToken = generateToken(
-    {
-      phone: newUser.phone,
-      country: newUser.country,
-      language: newUser.language,
-      role: newUser.role,
-    },
-    config.jwt_access_secret as string,
-    config.jwt_access_expires_in as string,
-  );
-  const refreshToken = generateToken(
-    {
-      phone: newUser.phone,
-      country: newUser.country,
-      language: newUser.language,
-      role: newUser.role,
-    },
-    config.jwt_refresh_secret as string,
-    config.jwt_refresh_expires_in as string,
-  );
+  if (user.phone_otp !== payload.otp) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Phone number or OTP does not match!",
+    );
+  }
 
-  newUser.refreshToken = refreshToken;
-  await newUser.save();
+  user.phone_otp = undefined;
+  user.phone_otp_expires_at = undefined;
+  await user.save();
 
-  return {
-    accessToken,
-    refreshToken,
-    user: newUser,
-  };
+  if (!user.phone || !user.country || !user.language) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Please complete your profile first!",
+    );
+  }
+
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user);
+  user.refreshToken = refreshToken;
+  await user.save();
+
+  return { accessToken, refreshToken, user };
 };
 
 const verifyOTP = async (email_otp: string, email: string) => {
