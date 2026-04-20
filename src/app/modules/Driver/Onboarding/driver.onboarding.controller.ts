@@ -24,7 +24,7 @@ const onboarding = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "A 6-digit verification code has been sent to your phone.",
+    message: "A 4-digit verification code has been sent to your phone.",
     data: {
       otp,
       phone_otp_expires_at,
@@ -35,8 +35,7 @@ const onboarding = catchAsync(async (req: Request, res: Response) => {
 const verifyPhoneOTP = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
 
-  const result =
-    await RydrOnboardingServices.verifyOnboardingPhoneOTP(payload);
+  const result = await RydrOnboardingServices.verifyOnboardingPhoneOTP(payload);
 
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, "OTP verification failed");
