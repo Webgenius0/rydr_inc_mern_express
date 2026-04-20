@@ -9,26 +9,26 @@ import { User } from "../../User/user.model";
 
 import { getOTPExpiryDate } from "../../../utils/dateHelper";
 import {
-  TRydrCompleteOnboarding,
-  TRydrOnboarding,
-  TRydrVerifyPhoneOTP,
-} from "./rydr.onboarding.interface";
+  TDriverCompleteOnboarding,
+  TDriverOnboarding,
+  TDriverVerifyPhoneOTP,
+} from "./driver.onboarding.interface";
 import {
   generateAccessToken,
   generateRefreshToken,
 } from "../../User/user.utils";
 import { generateOTP } from "../../../utils/authHelper";
 
-const rydrOnboarding = async (payload: TRydrOnboarding) => {
+const onboarding = async (payload: TDriverOnboarding) => {
   // checking if the user is exist
   // create token and sent to the  client
 
   const user = await User.findOne({ phone: payload.phone });
 
-  if (user?.role !== USER_ROLE.USER) {
+  if (user?.role !== USER_ROLE.DRIVER) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "You have already an driver account with this phone number! For user account choose another phone number.",
+      "You have already an account with this phone number! For driver account choose another phone number.",
     );
   }
 
@@ -63,7 +63,7 @@ const rydrOnboarding = async (payload: TRydrOnboarding) => {
   return { user, otp, phone_otp_expires_at: otpExpiresAt };
 };
 
-const rydrVerifyOnboardingPhoneOTP = async (payload: TRydrVerifyPhoneOTP) => {
+const verifyOnboardingPhoneOTP = async (payload: TDriverVerifyPhoneOTP) => {
   const result = await User.find({ phone: payload.phone });
   const user = result[0];
 
@@ -104,7 +104,7 @@ const rydrVerifyOnboardingPhoneOTP = async (payload: TRydrVerifyPhoneOTP) => {
   return { accessToken, refreshToken, user };
 };
 
-const rydrResendPhoneOTP = async (phone: string) => {
+const resendPhoneOTP = async (phone: string) => {
   const user = await User.findOne({ phone });
 
   if (!user) {
@@ -124,7 +124,7 @@ const rydrResendPhoneOTP = async (phone: string) => {
 
 const completeOnboarding = async (
   userId: string,
-  payload: TRydrCompleteOnboarding,
+  payload: TDriverCompleteOnboarding,
 ) => {
   const {
     first_name,
@@ -135,6 +135,7 @@ const completeOnboarding = async (
   } = payload;
 
   const user = await User.findById(userId);
+  console.log({ user });
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found!");
@@ -191,9 +192,9 @@ const refreshToken = async (token: string) => {
 };
 
 export const RydrOnboardingServices = {
-  rydrOnboarding,
-  rydrVerifyOnboardingPhoneOTP,
-  rydrResendPhoneOTP,
+  onboarding,
+  verifyOnboardingPhoneOTP,
+  resendPhoneOTP,
   completeOnboarding,
   refreshToken,
 };
