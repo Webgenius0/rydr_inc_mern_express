@@ -2,7 +2,7 @@
 import httpStatus from "http-status";
 import config from "../../../config";
 import sendResponse from "../../../utils/sendResponse";
-import { RydrOnboardingServices } from "./rydr.onboarding.service";
+import { RydrOnboardingServices } from "./driver.onboarding.service";
 import { catchAsync } from "../../../utils/catchAsync";
 import { Request, Response, CookieOptions } from "express";
 import AppError from "../../../errors/AppError";
@@ -14,11 +14,11 @@ const cookieOptions: CookieOptions = {
   sameSite: config.NODE_ENV === "production" ? "none" : "lax",
 };
 
-const rydrOnboarding = catchAsync(async (req: Request, res: Response) => {
+const onboarding = catchAsync(async (req: Request, res: Response) => {
   const body = req.body;
 
   const { otp, phone_otp_expires_at } =
-    await RydrOnboardingServices.rydrOnboarding(body);
+    await RydrOnboardingServices.onboarding(body);
 
   //TODO Send phone_otp to user via SMS (integration with SMS provider needed)
   sendResponse(res, {
@@ -35,8 +35,7 @@ const rydrOnboarding = catchAsync(async (req: Request, res: Response) => {
 const verifyPhoneOTP = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
 
-  const result =
-    await RydrOnboardingServices.rydrVerifyOnboardingPhoneOTP(payload);
+  const result = await RydrOnboardingServices.verifyOnboardingPhoneOTP(payload);
 
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, "OTP verification failed");
@@ -60,7 +59,7 @@ const verifyPhoneOTP = catchAsync(async (req: Request, res: Response) => {
 const resendPhoneOTP = catchAsync(async (req: Request, res: Response) => {
   const { phone } = req.body;
 
-  const result = await RydrOnboardingServices.rydrResendPhoneOTP(phone);
+  const result = await RydrOnboardingServices.resendPhoneOTP(phone);
 
   if (!result) {
     throw new AppError(httpStatus.BAD_REQUEST, "Failed to resend OTP");
@@ -129,7 +128,7 @@ const logout = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const RydrOnboardingControllers = {
-  rydrOnboarding,
+  onboarding,
   verifyPhoneOTP,
   resendPhoneOTP,
   completeOnboarding,
