@@ -25,12 +25,12 @@ const rydrOnboarding = async (payload: TRydrOnboarding) => {
 
   const user = await User.findOne({ phone: payload.phone });
 
-  if (user?.role !== USER_ROLE.USER) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "You have already an driver account with this phone number! For user account choose another phone number.",
-    );
-  }
+  // if (user?.role !== USER_ROLE.USER) {
+  //   throw new AppError(
+  //     httpStatus.BAD_REQUEST,
+  //     "You have already an driver account with this phone number! For user account choose another phone number.",
+  //   );
+  // }
 
   if (user) {
     if (!user.phone || !user.language) {
