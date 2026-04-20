@@ -6,21 +6,9 @@ const router = express.Router();
 
 const moduleRoutes = [
   {
-    path: "/rydr/onboarding",
+    path: "/onboarding",
     route: RydrOnboardingRoutes,
   },
-  // {
-  //   path: "/user",
-  //   route: UserRoutes,
-  // },
-  // {
-  //   path: "/faq",
-  //   route: FaqRoutes,
-  // },
-  // {
-  //   path: "/profile",
-  //   route: ProfileRoutes,
-  // },
 ];
 
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
