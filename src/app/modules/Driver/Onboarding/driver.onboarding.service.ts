@@ -130,8 +130,11 @@ const completeOnboarding = async (
     first_name,
     last_name,
     email,
+    country,
+    province,
+    city,
     agreed_terms_and_conditions,
-    currentLocation,
+    current_location,
   } = payload;
 
   const user = await User.findById(userId);
@@ -143,8 +146,11 @@ const completeOnboarding = async (
   user.first_name = first_name;
   user.last_name = last_name;
   user.email = email;
+  user.country = country;
+  user.province = province;
+  user.city = city;
   user.agreed_terms_and_conditions = agreed_terms_and_conditions;
-  user.currentLocation = currentLocation;
+  user.current_location = current_location;
 
   await user.save();
 
@@ -152,8 +158,11 @@ const completeOnboarding = async (
     first_name: user.first_name,
     last_name: user.last_name,
     email: user.email,
+    country: user.country,
+    province: user.province,
+    city: user.city,
     agreed_terms_and_conditions: user.agreed_terms_and_conditions,
-    currentLocation: user.currentLocation,
+    current_location: user.current_location,
   };
 };
 

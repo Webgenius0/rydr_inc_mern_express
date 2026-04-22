@@ -21,13 +21,18 @@ const resendPhoneOTPValidationSchema = z.object({
 
 const completeOnboardingValidationSchema = z.object({
   body: z.object({
-    first_name: z.string().optional(),
-    last_name: z.string().optional(),
-    email: z.string().email("Invalid email address").optional(),
-    agreed_terms_and_conditions: z
-      .boolean({ required_error: "Agreed terms and conditions is required" })
-      .optional(),
-    currentLocation: z
+    first_name: z.string({ required_error: "First name is required" }),
+    last_name: z.string({ required_error: "Last name is required" }),
+    email: z
+      .string({ required_error: "Email is required" })
+      .email("Invalid email address"),
+    country: z.string({ required_error: "Country is required" }),
+    province: z.string({ required_error: "Province is required" }),
+    city: z.string({ required_error: "City is required" }),
+    agreed_terms_and_conditions: z.boolean({
+      required_error: "Agreed terms and conditions is required",
+    }),
+    current_location: z
       .object({
         type: z.literal("Point"),
         coordinates: z.tuple([

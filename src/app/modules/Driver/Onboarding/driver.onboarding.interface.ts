@@ -14,10 +14,9 @@ export type TDriverCompleteOnboarding = {
   first_name: string;
   last_name: string;
   email: string;
-  country:string;
-  province:string;
-  city:string;
-  preferredService:string;
+  country: string;
+  province: string;
+  city: string;
   agreed_terms_and_conditions: boolean;
-  currentLocation: TGeoLocation;
+  current_location?: TGeoLocation;
 };

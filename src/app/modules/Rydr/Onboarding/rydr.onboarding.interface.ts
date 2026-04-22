@@ -15,5 +15,5 @@ export type TRydrCompleteOnboarding = {
   last_name: string;
   email: string;
   agreed_terms_and_conditions: boolean;
-  currentLocation: TGeoLocation;
+  current_location: TGeoLocation;
 };
