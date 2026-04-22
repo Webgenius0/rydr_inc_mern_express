@@ -1,7 +1,7 @@
 import express from "express";
 
 import { RydrOnboardingRoutes } from "../modules/Rydr/Onboarding/rydr.onboarding.route";
-import { RydrPreferredServiceRoutes } from "../modules/Dashboard/PreferredService/preferredService.route";
+import { PreferredServiceRoutes } from "../modules/Dashboard/PreferredService/preferredService.route";
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ const moduleRoutes = [
   },
   {
     path: "/preferred-services",
-    route: RydrPreferredServiceRoutes,
+    route: PreferredServiceRoutes,
   },
 ];
 
