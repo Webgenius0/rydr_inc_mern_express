@@ -25,10 +25,10 @@ const onboarding = async (payload: TDriverOnboarding) => {
 
   const user = await User.findOne({ phone: payload.phone });
 
-  if (user?.role !== USER_ROLE.DRIVER) {
+  if (user && user.role !== USER_ROLE.DRIVER) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "You have already an account with this phone number! For driver account choose another phone number.",
+      "You already have an account with this phone number! For driver account choose another phone number.",
     );
   }
 
@@ -49,7 +49,7 @@ const onboarding = async (payload: TDriverOnboarding) => {
 
   //create new user
   const newUser = await User.create(payload);
-  newUser.role = USER_ROLE.USER;
+  newUser.role = USER_ROLE.DRIVER;
   await newUser.save();
 
   const otp = generateOTP();
@@ -135,7 +135,6 @@ const completeOnboarding = async (
   } = payload;
 
   const user = await User.findById(userId);
-  console.log({ user });
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, "User not found!");
@@ -159,15 +158,21 @@ const completeOnboarding = async (
 };
 
 const refreshToken = async (token: string) => {
-  const decoded = jwt.verify(
-    token,
-    config.jwt_refresh_secret as string,
-  ) as JwtPayload;
+  let decoded: JwtPayload;
+
+  try {
+    decoded = jwt.verify(
+      token,
+      config.jwt_refresh_secret as string,
+    ) as JwtPayload;
+  } catch (err) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "Invalid refresh token!");
+  }
 
   const { id, phone } = decoded;
 
   const user = await User.findOne({
-    $or: [{ email: phone }, { phone: phone }, { _id: id }],
+    $or: [{ phone }, { _id: id }],
   });
 
   if (!user) {
@@ -178,6 +183,10 @@ const refreshToken = async (token: string) => {
 
   if (userStatus === "BLOCKED") {
     throw new AppError(httpStatus.FORBIDDEN, "This user is blocked!");
+  }
+
+  if (user.refreshToken !== token) {
+    throw new AppError(httpStatus.FORBIDDEN, "Refresh token not valid!");
   }
 
   const accessToken = generateAccessToken(user);
