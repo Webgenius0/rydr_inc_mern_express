@@ -25,16 +25,24 @@ const rydrOnboarding = async (payload: TRydrOnboarding) => {
 
   const user = await User.findOne({ phone: payload.phone });
 
-  // if (user?.role !== USER_ROLE.USER) {
-  //   throw new AppError(
-  //     httpStatus.BAD_REQUEST,
-  //     "You have already an driver account with this phone number! For user account choose another phone number.",
-  //   );
-  // }
+  if (user && user.role !== USER_ROLE.DRIVER) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "You have already an driver account with this phone number! For user account choose another phone number.",
+    );
+  }
 
   if (user) {
     if (!user.phone || !user.language) {
       throw new Error("Missing required user fields for token");
+    }
+    await user.save();
+
+    if (user.role !== USER_ROLE.USER) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "You already have an account with this phone number! For rydr account choose another phone number.",
+      );
     }
     const otp = generateOTP();
     const otpExpiresAt = getOTPExpiryDate(
@@ -158,15 +166,21 @@ const completeOnboarding = async (
 };
 
 const refreshToken = async (token: string) => {
-  const decoded = jwt.verify(
-    token,
-    config.jwt_refresh_secret as string,
-  ) as JwtPayload;
+  let decoded: JwtPayload;
+
+  try {
+    decoded = jwt.verify(
+      token,
+      config.jwt_refresh_secret as string,
+    ) as JwtPayload;
+  } catch (err) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "Invalid refresh token!");
+  }
 
   const { id, phone } = decoded;
 
   const user = await User.findOne({
-    $or: [{ email: phone }, { phone: phone }, { _id: id }],
+    $or: [{ phone: phone }, { _id: id }],
   });
 
   if (!user) {
@@ -177,6 +191,10 @@ const refreshToken = async (token: string) => {
 
   if (userStatus === "BLOCKED") {
     throw new AppError(httpStatus.FORBIDDEN, "This user is blocked!");
+  }
+
+  if (user.refreshToken !== token) {
+    throw new AppError(httpStatus.FORBIDDEN, "Refresh token not valid!");
   }
 
   const accessToken = generateAccessToken(user);
