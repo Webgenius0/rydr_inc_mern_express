@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from "mongoose";
 
 export type TVehicle = {
@@ -9,7 +10,7 @@ export type TVehicle = {
   manufacturing_year: number;
   license_plate_number: string;
   car_color: string;
-  car_information_details: JSON;
+  car_information_details: Record<string, any>;
   createdAt?: Date;
   updatedAt?: Date;
 };
