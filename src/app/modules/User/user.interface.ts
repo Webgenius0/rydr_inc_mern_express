@@ -31,3 +31,4 @@ export type TGeoLocation = {
   coordinates: [number, number];
   updatedAt?: Date;
 };
+
