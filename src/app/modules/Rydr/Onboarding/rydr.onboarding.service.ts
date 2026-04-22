@@ -139,7 +139,7 @@ const completeOnboarding = async (
     last_name,
     email,
     agreed_terms_and_conditions,
-    currentLocation,
+    current_location,
   } = payload;
 
   const user = await User.findById(userId);
@@ -152,7 +152,7 @@ const completeOnboarding = async (
   user.last_name = last_name;
   user.email = email;
   user.agreed_terms_and_conditions = agreed_terms_and_conditions;
-  user.currentLocation = currentLocation;
+  user.current_location = current_location;
 
   await user.save();
 
@@ -161,7 +161,7 @@ const completeOnboarding = async (
     last_name: user.last_name,
     email: user.email,
     agreed_terms_and_conditions: user.agreed_terms_and_conditions,
-    currentLocation: user.currentLocation,
+    current_location: user.current_location,
   };
 };
 

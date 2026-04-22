@@ -3,15 +3,15 @@ import AppError from "../../../errors/AppError";
 import { TPreferredService } from "./preferredService.interface";
 import PreferredServiceModel from "./preferredService.model";
 
-const createPreferredService = async (
-  payload: TPreferredService
-) => {
+const createPreferredService = async (payload: TPreferredService) => {
   const result = await PreferredServiceModel.create(payload);
   return result;
 };
 
 const getAllPreferredServices = async () => {
-  const result = await PreferredServiceModel.find();
+  const result = await PreferredServiceModel.find().select(
+    "title description vehicle_image can_take_passenger",
+  );
   return result;
 };
 
@@ -25,7 +25,7 @@ const getPreferredServiceById = async (id: string) => {
 
 const updatePreferredService = async (
   id: string,
-  payload: Partial<TPreferredService>
+  payload: Partial<TPreferredService>,
 ) => {
   const existingService = await PreferredServiceModel.findById(id);
   if (!existingService) {
