@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 import notFound from "./app/middlewares/notFound";
 import rydrRoutes from "./app/routes/rydr.routes";
 import driverRoutes from "./app/routes/driver.routes";
+import dashboardRoutes from "./app/routes/dashboard.routes";
 
 const app: Application = express();
 
@@ -41,6 +42,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1/rydr", rydrRoutes);
 app.use("/api/v1/driver", driverRoutes);
+app.use("/api/v1/dashboard", dashboardRoutes);
 
 // Home route
 app.get("/", (req: Request, res: Response) => {
