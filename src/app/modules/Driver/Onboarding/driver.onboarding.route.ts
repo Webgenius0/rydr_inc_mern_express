@@ -6,6 +6,7 @@ import validateRequest, {
 import { RydrOnboardingValidation } from "./driver.onboarding.validation";
 import { RydrOnboardingControllers } from "./driver.onboarding.controller";
 import protect from "../../../middlewares/auth";
+import { USER_ROLE } from "../../User/user.constant";
 
 const router = express.Router();
 
@@ -30,7 +31,7 @@ router.post(
 router.post(
   "/complete-onboarding",
   validateRequest(RydrOnboardingValidation.completeOnboardingValidationSchema),
-  protect("USER"),
+  protect(USER_ROLE.DRIVER),
   RydrOnboardingControllers.completeOnboarding,
 );
 

@@ -1,6 +1,6 @@
-import { Schema, model, Document } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 import { USER_ROLE, USER_STATUS } from "./user.constant";
-import { TUser, TGeoLocation } from "./user.interface";
+import { TUser } from "./user.interface";
 
 const userSchema = new Schema<TUser>(
   {
@@ -17,6 +17,7 @@ const userSchema = new Schema<TUser>(
       type: String,
 
       match: [
+        // eslint-disable-next-line no-useless-escape
         /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
         "Please fill a valid email address",
       ],
@@ -36,13 +37,11 @@ const userSchema = new Schema<TUser>(
     city: {
       type: String,
     },
-    preferredService: {
-      type: String,
-    },
+    vehicle: { type: mongoose.Types.ObjectId, ref: "Vehicle" },
     phone_otp: { type: String },
     phone_otp_expires_at: { type: Date },
     refreshToken: { type: String },
-    currentLocation: {
+    current_location: {
       type: {
         type: String,
         enum: ["Point"],
@@ -64,7 +63,7 @@ const userSchema = new Schema<TUser>(
       enum: Object.keys(USER_STATUS),
       default: USER_STATUS.ACTIVE,
     },
-    lastLoginAt: {
+    last_login_at: {
       type: Date,
       default: null,
     },
@@ -75,6 +74,6 @@ const userSchema = new Schema<TUser>(
   },
 );
 
-userSchema.index({ currentLocation: "2dsphere" });
+userSchema.index({ current_location: "2dsphere" });
 
 export const User = model<TUser>("User", userSchema);

@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { USER_ROLE, USER_STATUS } from "./user.constant";
 
 export type TUser = {
@@ -12,18 +13,18 @@ export type TUser = {
   country?: string;
   province?: string;
   city?: string;
-  preferredService?: string;
-  
-  phone_otp?: string; 
+  vehicle?: mongoose.Types.ObjectId;
+
+  phone_otp?: string;
   phone_otp_expires_at?: Date;
   refreshToken?: string;
-  currentLocation?: TGeoLocation;
+  current_location?: TGeoLocation;
   role: keyof typeof USER_ROLE;
   status: keyof typeof USER_STATUS;
 
   createdAt?: Date;
   updatedAt?: Date;
-  lastLoginAt?: Date;
+  last_login_at?: Date;
 };
 
 export type TGeoLocation = {
@@ -31,4 +32,3 @@ export type TGeoLocation = {
   coordinates: [number, number];
   updatedAt?: Date;
 };
-

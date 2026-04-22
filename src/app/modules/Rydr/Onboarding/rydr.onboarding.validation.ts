@@ -27,7 +27,7 @@ const rydrCompleteOnboardingValidationSchema = z.object({
     agreed_terms_and_conditions: z
       .boolean({ required_error: "Agreed terms and conditions is required" })
       .optional(),
-    currentLocation: z
+    current_location: z
       .object({
         type: z.literal("Point"),
         coordinates: z.tuple([

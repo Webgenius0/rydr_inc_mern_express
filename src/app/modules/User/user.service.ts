@@ -201,11 +201,10 @@ const getSingleUser = async (id: string) => {
     country: user.country ?? null,
     province: user.province ?? null,
     city: user.city ?? null,
-    preferredService: user.preferredService ?? null,
     agreed_terms_and_conditions: user.agreed_terms_and_conditions ?? false,
     createdAt: user.createdAt ?? null,
     updatedAt: user.updatedAt ?? null,
-    lastLoginAt: user.lastLoginAt ?? null,
+    last_login_at: user.last_login_at ?? null,
   };
 };
 
