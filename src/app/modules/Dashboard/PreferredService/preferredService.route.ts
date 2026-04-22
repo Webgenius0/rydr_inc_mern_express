@@ -20,7 +20,7 @@ router.get(
 
 router.post(
   "/",
-  auth(USER_ROLE.ADMIN),
+  auth(USER_ROLE.ADMIN, USER_ROLE.DRIVER),
   validateRequest(
     RydrPreferredServiceValidation.createPreferredServiceValidationSchema,
   ),
@@ -29,7 +29,7 @@ router.post(
 
 router.patch(
   "/:id",
-  auth(USER_ROLE.ADMIN),
+  auth(USER_ROLE.ADMIN, USER_ROLE.DRIVER),
   validateRequest(
     RydrPreferredServiceValidation.updatePreferredServiceValidationSchema,
   ),
@@ -38,7 +38,7 @@ router.patch(
 
 router.delete(
   "/:id",
-  auth(USER_ROLE.ADMIN),
+  auth(USER_ROLE.ADMIN, USER_ROLE.DRIVER),
   validateRequest(
     RydrPreferredServiceValidation.getPreferredServiceByIdValidationSchema,
   ),
