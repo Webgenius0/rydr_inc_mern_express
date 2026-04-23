@@ -10,7 +10,7 @@ const generateHash = (buffer: Buffer) => {
 export const uploadOrGetExistingImage = async (file: any) => {
   const hash = generateHash(file.buffer);
 
-  // 🔍 check existing
+ 
   const existing = await ImageModel.findOne({ hash });
 
   if (existing) {
@@ -20,7 +20,6 @@ export const uploadOrGetExistingImage = async (file: any) => {
     return existing.url;
   }
 
-  // ☁️ upload new
   const result: any = await new Promise((resolve, reject) => {
     const stream = cloudinaryUpload.uploader.upload_stream(
       {
