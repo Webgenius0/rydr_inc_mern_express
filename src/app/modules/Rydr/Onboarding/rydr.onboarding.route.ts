@@ -51,5 +51,5 @@ router.post(
   ),
   RydrOnboardingControllers.logout,
 );
-
 export const RydrOnboardingRoutes = router;
+
